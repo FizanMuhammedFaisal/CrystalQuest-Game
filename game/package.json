@@ -1,0 +1,47 @@
+{
+    "name": "game",
+    "description": "A Phaser 3 TypeScript project ",
+    "version": "1.0.3",
+    "author": "",
+    "type": "module",
+    "homepage": "https://github.com/phaserjs/template-react-ts#readme",
+    "keywords": [
+        "phaser",
+        "phaser3",
+        "react",
+        "vite",
+        "typescript"
+    ],
+    "scripts": {
+        "dev": " vite ",
+        "build": "tsc -b && vite build",
+        "dev-nolog": "vite ",
+        "preview": "vite preview --port 8080"
+    },
+    "dependencies": {
+        "@tailwindcss/vite": "^4.1.4",
+        "grid-engine": "^2.48.0",
+        "lucide-react": "^0.488.0",
+        "motion": "^12.7.4",
+        "phaser": "^3.88.2",
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0",
+        "tailwindcss": "^4.1.4",
+        "zustand": "^5.0.3"
+    },
+    "devDependencies": {
+        "@originjs/vite-plugin-federation": "^1.4.1",
+        "@types/node": "^22.14.1",
+        "@types/react": "^18.3.3",
+        "@types/react-dom": "^18.3.0",
+        "@typescript-eslint/eslint-plugin": "^7.13.1",
+        "@typescript-eslint/parser": "^7.13.1",
+        "@vitejs/plugin-react": "^4.3.1",
+        "eslint": "^8.57.0",
+        "eslint-plugin-react-hooks": "^4.6.2",
+        "eslint-plugin-react-refresh": "^0.4.7",
+        "terser": "^5.28.1",
+        "typescript": "^5.2.2",
+        "vite": "^6.2.6"
+    }
+}
