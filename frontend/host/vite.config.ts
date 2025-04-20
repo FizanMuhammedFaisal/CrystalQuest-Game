@@ -12,7 +12,8 @@ export default defineConfig({
       remotes: {
         game: 'http://localhost:8080/assets/remoteEntry.js',
         auth: 'http://localhost:8081/assets/remoteEntry.js',
-        portal: 'http://localhost:8082/assets/remoteEntry.js'
+        portal: 'http://localhost:8082/assets/remoteEntry.js',
+        dashboard: 'http://localhost:8083/assets/remoteEntry.js'
       },
       shared: ['react', 'react-dom']
     })

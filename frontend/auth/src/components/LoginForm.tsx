@@ -24,8 +24,8 @@ export function LoginForm() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ y: 20 }}
+      animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
       className='flex min-h-screen flex-col items-center justify-center bg-[#111827] p-4'
     >
@@ -143,7 +143,7 @@ export function LoginForm() {
           <p className='font-pixel text-sm text-[#9CA3AF]'>
             NEW PLAYER?{' '}
             <a
-              href='/auth/login'
+              href='/auth/signup'
               className='text-[#4ADE80] hover:text-[#22C55E]'
             >
               SIGN UP

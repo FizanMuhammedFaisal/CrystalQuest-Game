@@ -28,8 +28,8 @@ export function SignupForm() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ y: 20 }}
+      animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
       className='flex min-h-screen flex-col items-center justify-center bg-[#111827] p-4'
     >

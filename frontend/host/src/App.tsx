@@ -5,9 +5,13 @@ import {
 } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 
-// Properly wrap remote modules in lazy loading
 const Game = lazy(() =>
   import('game/Game').catch(() => ({
+    default: () => <div>Failed to load Game</div>
+  }))
+)
+const DashBoard = lazy(() =>
+  import('dashboard/Dashboard').catch(() => ({
     default: () => <div>Failed to load Game</div>
   }))
 )
@@ -52,7 +56,11 @@ const router = createBrowserRouter([
   },
   {
     path: 'auth/*',
-    element: <LazyComponent Component={Auth} />
+    element: <Auth />
+  },
+  {
+    path: 'dashboard',
+    element: <LazyComponent Component={DashBoard} />
   }
 ])
 
