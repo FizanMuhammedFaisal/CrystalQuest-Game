@@ -13,15 +13,25 @@
         "isolatedModules": true,
         "noEmit": true,
         "jsx": "react-jsx",
+        "outDir": "dist",
 
         /* Linting */
         "strict": true,
         "strictPropertyInitialization": false,
-        "typeRoots": ["node_modules/@types", "src/types"],
+        "typeRoots": [
+            "node_modules/@types",
+            "src/types",
+            "./node_modules/phaser/types"
+        ],
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true
     },
-    "include": ["src", "src/types"],
-    "references": [{ "path": "./tsconfig.node.json" }]
+    "include": ["src", "src/types", "**/*.ts"],
+    "references": [{ "path": "./tsconfig.node.json" }],
+    "ts-node": {
+        "compilerOptions": {
+            "module": "commonjs"
+        }
+    }
 }

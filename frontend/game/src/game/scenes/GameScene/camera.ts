@@ -57,7 +57,7 @@ export class GameCamera {
     }
 
     private followPlayer(scene: Game) {
-        const playerSprite = scene.player.getSprite();
+        const playerSprite = scene.player;
         this.camera.startFollow(playerSprite, true, 0.1, 0.1);
         this.isFollowingPlayer = true;
     }
@@ -94,10 +94,10 @@ export class GameCamera {
     }
 
     public onPlayerMove(scene: Game) {
-        const playerSprite = scene.player.getSprite();
+        const playerSprite = scene.player;
         this.camera.height / (2 * this.camera.zoom) - playerSprite.height / 2;
         if (!this.isFollowingPlayer && !this.isDragging) {
-            const playerSprite = scene.player.getSprite();
+            const playerSprite = scene.player;
             this.camera.pan(
                 playerSprite.x,
                 playerSprite.y,

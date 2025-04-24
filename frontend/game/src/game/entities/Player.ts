@@ -1,89 +1,125 @@
 import Phaser from "phaser";
-import { Direction } from "grid-engine";
 import { GameScene } from "../types/scenes";
 
-export class Player {
-    private sprite: Phaser.GameObjects.Sprite;
-    private scene: GameScene;
-    public readonly id: string = "Player";
+import { ControlsComponent } from "../components/gameobject/controlsComponent";
+import { InputComponent } from "../components/input/inputComponent";
 
-    constructor(scene: GameScene, x: number, y: number) {
-        this.scene = scene;
-        this.sprite = scene.add.sprite(x, y, "Player");
-        scene.physics.add.existing(this.sprite);
-    }
-    public getSprite(): Phaser.GameObjects.Sprite {
-        return this.sprite;
-    }
-    public getId(): string {
-        return this.id;
-    }
+import { StateMachine } from "../components/statemachine/statemachine";
+import { IdleState } from "../components/statemachine/states/character/idleState";
+import { CHARACTER_STATES } from "../components/statemachine/states/character/characterStates";
+import { MoveState } from "../components/statemachine/states/character/moveState";
+import { SpeedsComponent } from "../components/gameobject/speedComponent";
+import { PLAYER_SPEED } from "../../config";
+import { DirectionComponent } from "../components/gameobject/directionComponent";
+import { Direction } from "../types/types";
+import {
+    AnimationComponent,
+    AnimationConfig,
+} from "../components/gameobject/animationComponent";
+import { PLAYER_ANIMATION_KEYS } from "../../common/assets";
+type TPlayer = {
+    scene: GameScene;
+    positions: { x: number; y: number };
+    assetKey: string;
+    controls: InputComponent;
+};
+export class Player extends Phaser.Physics.Arcade.Sprite {
+    private controlsComponent: ControlsComponent;
+    private stateMachine: StateMachine;
+    private speedComponent: SpeedsComponent;
+    private directionComponent: DirectionComponent;
+    private _animationComponent: AnimationComponent;
+    constructor(config: TPlayer) {
+        const { scene, positions, assetKey, controls } = config;
+        const { x, y } = positions;
+        super(scene, x, y, assetKey);
+        scene.add.existing(this);
+        scene.physics.add.existing(this);
+        const animationConfig: AnimationConfig = {
+            WALK_DOWN: {
+                key: PLAYER_ANIMATION_KEYS.WALK_DOWN,
+                repeat: -1,
+                ignoreIfPlaying: true,
+            },
+            WALK_UP: {
+                key: PLAYER_ANIMATION_KEYS.WALK_UP,
+                repeat: -1,
+                ignoreIfPlaying: true,
+            },
+            WALK_LEFT: {
+                key: PLAYER_ANIMATION_KEYS.WALK_SIDE,
+                repeat: -1,
+                ignoreIfPlaying: true,
+            },
+            WALK_RIGHT: {
+                key: PLAYER_ANIMATION_KEYS.WALK_SIDE,
+                repeat: -1,
+                ignoreIfPlaying: true,
+            },
+            IDLE_DOWN: {
+                key: PLAYER_ANIMATION_KEYS.IDLE_DOWN,
+                repeat: -1,
+                ignoreIfPlaying: true,
+            },
+            IDLE_UP: {
+                key: PLAYER_ANIMATION_KEYS.IDLE_UP,
+                repeat: -1,
+                ignoreIfPlaying: true,
+            },
+            IDLE_LEFT: {
+                key: PLAYER_ANIMATION_KEYS.IDLE_SIDE,
+                repeat: -1,
+                ignoreIfPlaying: true,
+            },
+            IDLE_RIGHT: {
+                key: PLAYER_ANIMATION_KEYS.IDLE_SIDE,
+                repeat: -1,
+                ignoreIfPlaying: true,
+            },
+        };
+        // Initialize components first
+        this.controlsComponent = new ControlsComponent(this, controls);
+        this.speedComponent = new SpeedsComponent(this, PLAYER_SPEED);
+        this.directionComponent = new DirectionComponent(this);
+        this._animationComponent = new AnimationComponent(
+            this,
+            animationConfig
+        );
 
+        // Then initialize state machine
+        this.stateMachine = new StateMachine("player");
+        this.stateMachine.addState(new IdleState(this));
+        this.stateMachine.addState(new MoveState(this));
+        this.stateMachine.setState(CHARACTER_STATES.IDLE_STATE);
+
+        scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this);
+        scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            scene.events.off(Phaser.Scenes.Events.UPDATE, this.update, this);
+        });
+    }
     public getGridEngineConfig() {
         return {
             id: this.id,
-            sprite: this.sprite,
             startPosition: { x: 20, y: 60 },
-            speed: 10,
-            disableAutomaticDepthSorting: true,
-            // Optional: if you don't need character-to-character collisions
             ignoreCollisions: true,
-            walkingAnimationMapping: {
-                up: {
-                    leftFoot: 7,
-                    standing: 6,
-                    rightFoot: 8,
-                },
-                down: {
-                    leftFoot: 1,
-                    standing: 0,
-                    rightFoot: 2,
-                },
-                left: {
-                    leftFoot: 4,
-                    standing: 3,
-                    rightFoot: 5,
-                },
-                right: {
-                    leftFoot: 10,
-                    standing: 9,
-                    rightFoot: 11,
-                },
-            },
         };
     }
-
-    public setupMovementControls() {
-        const cursors = this.scene.input.keyboard.createCursorKeys();
-        const wasd = this.scene.input.keyboard.addKeys("W,S,A,D") as {
-            W: Phaser.Input.Keyboard.Key;
-            S: Phaser.Input.Keyboard.Key;
-            A: Phaser.Input.Keyboard.Key;
-            D: Phaser.Input.Keyboard.Key;
-        };
-        // Game loop update
-        this.scene.events.on("update", () => {
-            // Skip if player is already moving
-            // if (this.scene.gridEngine.isMoving(this.id)) {
-            //     return;
-            // }
-            //lern movemebnt and motion stuff
-            // Handle movement based on key press
-            switch (true) {
-                case cursors.left.isDown || wasd.A.isDown:
-                    this.scene.gridEngine.move(this.id, Direction.LEFT);
-                    break;
-                case cursors.right.isDown || wasd.D.isDown:
-                    this.scene.gridEngine.move(this.id, Direction.RIGHT);
-                    break;
-                case cursors.up.isDown || wasd.W.isDown:
-                    this.scene.gridEngine.move(this.id, Direction.UP);
-                    break;
-                case cursors.down.isDown || wasd.S.isDown:
-                    this.scene.gridEngine.move(this.id, Direction.DOWN);
-                    break;
-            }
-        });
+    get controls(): InputComponent {
+        return this.controlsComponent.controls;
     }
-    public update() {}
+    get speed(): number {
+        return this.speedComponent.speed;
+    }
+    get direction(): Direction {
+        return this.directionComponent.direction;
+    }
+    set direction(direction: Direction) {
+        this.directionComponent.direction = direction;
+    }
+    public update(): void {
+        this.stateMachine.update();
+    }
+    get animationComponent(): AnimationComponent {
+        return this._animationComponent;
+    }
 }

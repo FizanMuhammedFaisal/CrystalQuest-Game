@@ -1,12 +1,13 @@
-import { AUTO, Game } from "phaser";
+import Phaser, { Game } from "phaser";
 import * as scenes from "./scenes";
 import GridEngine from "grid-engine";
+import DayNightPipeline from "./shaders/DayNightPipeline";
 
 const config: Phaser.Types.Core.GameConfig = {
     width: 1024, // 1024
     height: 768, // 768
     title: "Phaser RPG",
-    type: AUTO,
+    type: Phaser.WEBGL,
     parent: "game-container",
     backgroundColor: "#000000",
     scene: [
@@ -31,6 +32,9 @@ const config: Phaser.Types.Core.GameConfig = {
                 mapping: "gridEngine",
             },
         ],
+    },
+    pipeline: {
+        DayNight: DayNightPipeline,
     },
     render: {
         pixelArt: true,

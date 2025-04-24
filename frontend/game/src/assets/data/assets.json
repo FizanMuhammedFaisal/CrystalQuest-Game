@@ -1,0 +1,66 @@
+[
+    {
+        "path": "/src/assets/sprites/player/",
+        "files": [
+            {
+                "type": "aseprite",
+                "key": "PLAYER",
+                "textureURL": "main_green.png",
+                "atlasURL": "main_green.json"
+            }
+        ]
+    },
+    {
+        "path": "/src/assets/tilemaps/",
+        "files": [
+            {
+                "type": "tilemapTiledJSON",
+                "key": "game-map",
+                "url": "game.json"
+            }
+        ]
+    },
+    {
+        "path": "/src/assets/tilesets/",
+        "files": [
+            {
+                "type": "image",
+                "key": "Tiles",
+                "url": "Tiles.png"
+            },
+            {
+                "type": "image",
+                "key": "Trees",
+                "url": "trees.png"
+            },
+            {
+                "type": "image",
+                "key": "CollisionTiles",
+                "url": "CollisionTiles.png"
+            },
+            {
+                "type": "image",
+                "key": "WoodWalls",
+                "url": "WoodWalls.png"
+            },
+            {
+                "type": "spritesheet",
+                "key": "Crystal",
+                "url": "crystal.png",
+                "frameConfig": {
+                    "frameWidth": 32,
+                    "frameHeight": 32
+                }
+            },
+            {
+                "type": "spritesheet",
+                "key": "FountainStone",
+                "url": "FountainStone.png",
+                "frameConfig": {
+                    "frameWidth": 32,
+                    "frameHeight": 32
+                }
+            }
+        ]
+    }
+]

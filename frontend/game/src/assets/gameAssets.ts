@@ -28,4 +28,10 @@ export function loadGameAssets(scene: Phaser.Scene) {
         frameWidth: 32.25,
         frameHeight: 68,
     });
+    scene.load.aseprite(
+        "player-idle",
+
+        "/src/assets/sprites/Sprite-0020.png",
+        "/src/assets/sprites/Sprite-0020.json"
+    );
 }

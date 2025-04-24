@@ -1,5 +1,5 @@
 import { Game } from "../Game";
-import * as Keys from "../../../constants";
+import * as Keys from "../../../common";
 import { useGameStore } from "../../../stores/gameStore";
 export function setupFountainStone(scene: Game) {
     const objectLayer = scene.tilemap.getObjectLayer("ObjectLayer");
@@ -37,7 +37,7 @@ export function setupFountainStone(scene: Game) {
     let isInteracting = false;
 
     scene.physics.add.overlap(
-        scene.player.getSprite(),
+        scene.player,
         stone,
         () => {
             const gameStore = useGameStore.getState();
@@ -98,8 +98,8 @@ export function setupFountainStone(scene: Game) {
         delay: 100, // Check every 100ms
         callback: () => {
             const distance = Phaser.Math.Distance.Between(
-                scene.player.getSprite().x,
-                scene.player.getSprite().y,
+                scene.player.x,
+                scene.player.y,
                 stone.x,
                 stone.y
             );

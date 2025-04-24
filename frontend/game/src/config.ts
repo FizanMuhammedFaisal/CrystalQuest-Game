@@ -4,3 +4,4 @@ export const CONFIG = {
 };
 
 export default CONFIG;
+export const PLAYER_SPEED = 80;

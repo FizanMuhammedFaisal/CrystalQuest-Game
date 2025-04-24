@@ -1,9 +1,9 @@
 import { useRef } from "react";
 import { IRefPhaserGame, PhaserGame } from "./game/PhaserGame";
-import CrystalHUD from "./components/CrystalHUD";
-import { Notification } from "./components/GameUI";
+import CrystalHUD from "./reactComponents/CrystalHUD";
+import { Notification } from "./reactComponents/GameUI";
 import { useGameStore } from "./stores/gameStore";
-import { GameCompleteOverlay } from "./components/GameCompleteOverlay";
+import { GameCompleteOverlay } from "./reactComponents/GameCompleteOverlay";
 
 function App() {
     console.log("gamlaunch");

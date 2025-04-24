@@ -9,6 +9,8 @@ interface GameState {
     targetCrystals: number;
     isGameComplete: boolean;
     messageType: MessageType;
+    lightsHeld: number;
+    maxLights: number;
     // Actions
     collectCrystal: () => void;
     serveCrystals: () => void;
@@ -17,6 +19,7 @@ interface GameState {
     setMessage: (message: string | null, type: MessageType) => void;
     checkWinCondition: () => void;
     resetGame: () => void;
+    collectLight: () => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -27,6 +30,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     targetCrystals: 5,
     isGameComplete: false,
     messageType: null,
+    lightsHeld: 0,
+    maxLights: 3,
     collectCrystal: () => {
         console.log("collecting");
         if (get().canCollectCrystal()) {
@@ -96,5 +101,15 @@ export const useGameStore = create<GameState>((set, get) => ({
     },
     canCollectCrystal: () => {
         return get().crystalsHeld < get().maxCrystals;
+    },
+    collectLight: () => {
+        if (get().lightsHeld < get().maxLights) {
+            set((state) => ({
+                lightsHeld: state.lightsHeld + 1,
+            }));
+            get().setMessage("Light collected!", "success");
+        } else {
+            get().setMessage("Cannot carry more lights!", "error");
+        }
     },
 }));

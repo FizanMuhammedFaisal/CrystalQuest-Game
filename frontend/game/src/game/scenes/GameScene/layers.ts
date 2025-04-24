@@ -1,5 +1,5 @@
 import { Game } from "../Game";
-import * as Keys from "../../../constants";
+import * as Keys from "../../../common";
 
 export interface GameLayers {
     ground: Phaser.Tilemaps.TilemapLayer;

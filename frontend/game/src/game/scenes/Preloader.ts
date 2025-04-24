@@ -1,5 +1,6 @@
 import { Scene } from "phaser";
 import { loadGameAssets } from "../../assets/gameAssets";
+import { ASSET_PACK_KEYS, ASSET_KEYS } from "../../common/assets";
 
 export class Preloader extends Scene {
     constructor() {
@@ -9,10 +10,11 @@ export class Preloader extends Scene {
     init() {}
 
     preload() {
-        loadGameAssets(this);
+        this.load.pack(ASSET_PACK_KEYS.MAIN, "/src/assets/data/assets.json");
     }
 
     create() {
+        this.anims.createFromAseprite(ASSET_KEYS.PLAYER);
         this.anims.create({
             key: "crystal-spin",
             frames: this.anims.generateFrameNumbers("Crystal", {
@@ -31,9 +33,8 @@ export class Preloader extends Scene {
             frameRate: 8,
             repeat: -1,
         });
-        this.scene.start("Game");
-        this.cameras.main.fadeOut(100, 0, 0, 0);
-        this.cameras.main.once("camerafadeoutcomplete", () => {
+
+        this.input.keyboard.once("keydown-SPACE", () => {
             this.scene.start("Game");
         });
     }

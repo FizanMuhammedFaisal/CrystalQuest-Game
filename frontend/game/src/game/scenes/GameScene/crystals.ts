@@ -1,6 +1,6 @@
 import { useGameStore } from "../../../stores/gameStore";
 import { Game } from "../Game";
-import * as Keys from "../../../constants";
+import * as Keys from "../../../common";
 
 const RESPAWN_TIME = 5000; // 5 seconds
 const SPAWN_POINTS_MEMORY = new Map<string, boolean>();
@@ -58,7 +58,7 @@ export function spawnCrystals(spawnChance: number = 0.5, scene: Game) {
 
     // Collision handling
     scene.physics.add.overlap(
-        scene.player.getSprite(),
+        scene.player,
         crystals,
         (
             _player: Phaser.GameObjects.Sprite,
