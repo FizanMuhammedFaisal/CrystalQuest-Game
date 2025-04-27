@@ -30,7 +30,20 @@ export class AnimationComponent extends BaseGameobjectComponent {
         characterAnimationKey: CharacterAnimation,
         callback?: () => void
     ): void {
+        if (!this.gameObject) {
+            console.error("No gameObject found in AnimationComponent");
+            return;
+        }
+
+        if (!this.config) {
+            console.error("No animation config found");
+            return;
+        }
+
         if (this.config[characterAnimationKey] === undefined) {
+            console.error(
+                `No animation config found for key: ${characterAnimationKey}`
+            );
             if (callback) {
                 callback();
             }

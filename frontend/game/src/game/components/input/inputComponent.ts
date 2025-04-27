@@ -3,6 +3,10 @@ export class InputComponent {
     private down: boolean;
     private left: boolean;
     private right: boolean;
+    private W: boolean;
+    private S: boolean;
+    private A: boolean;
+    private D: boolean;
     private actionKey: boolean;
     private attackKey: boolean;
     private selectKey: boolean;
@@ -16,6 +20,10 @@ export class InputComponent {
         this.attackKey = false;
         this.selectKey = false;
         this.enterKey = false;
+        this.W = false;
+        this.S = false;
+        this.A = false;
+        this.D = false;
     }
     get isUpDown(): boolean {
         return this.up;
@@ -41,6 +49,32 @@ export class InputComponent {
     set isRightDown(val: boolean) {
         this.right = val;
     }
+    get isWDown(): boolean {
+        return this.W;
+    }
+    set isWDown(val: boolean) {
+        this.W = val;
+    }
+    get isSDown(): boolean {
+        return this.S;
+    }
+
+    set isSDown(val: boolean) {
+        this.S = val;
+    }
+    get isADown(): boolean {
+        return this.A;
+    }
+    set isADown(val: boolean) {
+        this.A = val;
+    }
+    get isDDown(): boolean {
+        return this.D;
+    }
+    set isDDown(val: boolean) {
+        this.D = val;
+    }
+
     get isActionKeyJustDown(): boolean {
         return this.actionKey;
     }
@@ -65,6 +99,7 @@ export class InputComponent {
     set isEnterKeyJustDown(val: boolean) {
         this.selectKey = val;
     }
+
     public reset(): void {
         this.actionKey = false;
         this.attackKey = false;
@@ -74,5 +109,9 @@ export class InputComponent {
         this.right = false;
         this.up = false;
         this.enterKey = false;
+        this.W = false;
+        this.S = false;
+        this.A = false;
+        this.D = false;
     }
 }

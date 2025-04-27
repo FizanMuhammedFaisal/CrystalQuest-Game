@@ -3,6 +3,8 @@ export const ASSET_PACK_KEYS = {
 } as const;
 export const ASSET_KEYS = {
     PLAYER: "PLAYER",
+    ENIMIE_SLIME: "ENIMIE_SLIME",
+    COLLISION: "CollisionTiles",
 } as const;
 export const PLAYER_ANIMATION_KEYS = {
     WALK_DOWN: "player_walk_down",
@@ -31,6 +33,20 @@ export const PLAYER_ANIMATION_KEYS = {
     SWORD_1_ATTACK_SIDE: "player_atk_1_side",
 } as const;
 
+export const ENIMIE_SLIME_ANIMATION_KEYS = {
+    WALK_RIGHT: "enimie_slime_jump_right",
+    WALK_LEFT: "enimie_slime_jump_left",
+    IDLE_RIGHT: "enimie_slime_idle_right",
+    IDLE_LEFT: "enimie_slime_idle_left",
+    HURT_RIGHT: "enimie_slime_jump_right",
+    HURT_LEFT: "enimie_slime_jump_right",
+    HURT_DOWN: "enimie_slime_jump_right",
+    HURT_UP: "enimie_slime_jump_right",
+    DIE_DOWN: "enimie_slime_jump_right",
+    DIE_UP: "enimie_slime_jump_right",
+    DIE_LEFT: "enimie_slime_jump_right",
+    DIE_RIGHT: "enimie_slime_jump_right",
+} as const;
 export const CHARACTER_ANIMATIONS = {
     IDLE_DOWN: "IDLE_DOWN",
     IDLE_UP: "IDLE_UP",

@@ -36,7 +36,7 @@
             {
                 "type": "image",
                 "key": "CollisionTiles",
-                "url": "CollisionTiles.png"
+                "url": "Collition.png"
             },
             {
                 "type": "image",
@@ -60,6 +60,22 @@
                     "frameWidth": 32,
                     "frameHeight": 32
                 }
+            },
+            {
+                "type": "image",
+                "key": "GroundSet",
+                "url": "GroundSet.png"
+            }
+        ]
+    },
+    {
+        "path": "/src/assets/sprites/enimies/slime/",
+        "files": [
+            {
+                "type": "aseprite",
+                "key": "ENIMIE_SLIME",
+                "textureURL": "PixelArtSlime.png",
+                "atlasURL": "PixelArtSlime.json"
             }
         ]
     }

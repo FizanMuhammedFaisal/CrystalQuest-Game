@@ -21,6 +21,13 @@ export class GameControls {
     }
 }
 
-export function setupControls(scene: Game, camera: GameCamera): GameControls {
-    return new GameControls(scene, camera);
+export function setupControls(scene: Game, camera: GameCamera): void {
+    const areaSize = scene.objectByAreaId[scene.levelData.areaId].area;
+    scene.cameras.main.setBounds(
+        areaSize.x,
+        areaSize.y,
+        areaSize.width,
+        areaSize.height
+    );
+    scene.cameras.main.startFollow(scene.player);
 }

@@ -1,8 +1,7 @@
 import Phaser from "phaser";
 import { globalTime } from "../TimeManager";
 
-export default class DayNightPipeline extends Phaser.Renderer.WebGL.Pipelines
-    .PostFXPipeline {
+export default class DayNightPipeline extends Phaser.Scene {
     constructor(game: Phaser.Game) {
         super({
             game,

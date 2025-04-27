@@ -1,9 +1,9 @@
-import { Player } from "../../../../entities/Player";
+import { CharactrerGameObject } from "../../../gameobject/common/characterGameObject";
 import { BaseCharacterState } from "./baseChacacterState";
 import { CHARACTER_STATES } from "./characterStates";
 
 export class IdleState extends BaseCharacterState {
-    constructor(gameObject: Player) {
+    constructor(gameObject: CharactrerGameObject) {
         super(CHARACTER_STATES.IDLE_STATE, gameObject);
     }
     public onEnter(): void {

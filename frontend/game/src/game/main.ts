@@ -24,18 +24,10 @@ const config: Phaser.Types.Core.GameConfig = {
             debug: false,
         },
     },
-    plugins: {
-        scene: [
-            {
-                key: "gridEngine",
-                plugin: GridEngine,
-                mapping: "gridEngine",
-            },
-        ],
-    },
-    pipeline: {
-        DayNight: DayNightPipeline,
-    },
+    plugins: {},
+    // pipeline: {
+    //     DayNight: DayNightPipeline,
+    // },
     render: {
         pixelArt: true,
         antialias: false,

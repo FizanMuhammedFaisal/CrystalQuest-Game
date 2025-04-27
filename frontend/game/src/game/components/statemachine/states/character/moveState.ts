@@ -1,11 +1,12 @@
 import { DIRECTION } from "../../../../../common/common";
-import { Player } from "../../../../entities/Player";
+
 import { Direction } from "../../../../types/types";
+import { CharactrerGameObject } from "../../../gameobject/common/characterGameObject";
 import { BaseCharacterState } from "./baseChacacterState";
 import { CHARACTER_STATES } from "./characterStates";
 
 export class MoveState extends BaseCharacterState {
-    constructor(gameObject: Player) {
+    constructor(gameObject: CharactrerGameObject) {
         super(CHARACTER_STATES.MOVE_STATE, gameObject);
     }
     private updateVelocity(isX: boolean, value: number): void {
@@ -23,6 +24,7 @@ export class MoveState extends BaseCharacterState {
 
     onUpdate(): void {
         const controls = this._gameObject.controls;
+
         if (
             !controls.isUpDown &&
             !controls.isDownDown &&

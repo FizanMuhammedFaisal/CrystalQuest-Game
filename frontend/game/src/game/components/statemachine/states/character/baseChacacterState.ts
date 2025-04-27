@@ -1,11 +1,11 @@
-import { Player } from "../../../../entities/Player";
+import { CharactrerGameObject } from "../../../gameobject/common/characterGameObject";
 import { State, StateMachine } from "../../statemachine";
 
 export abstract class BaseCharacterState implements State {
-    protected _gameObject: Player;
+    protected _gameObject: CharactrerGameObject;
     protected _stateMachine: StateMachine;
     private _name: string;
-    constructor(name: string, gameObeject: Player) {
+    constructor(name: string, gameObeject: CharactrerGameObject) {
         this._name = name;
         this._gameObject = gameObeject;
     }
