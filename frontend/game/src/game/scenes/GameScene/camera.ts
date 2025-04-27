@@ -119,6 +119,33 @@ import { Game } from "../Game";
 // export function setupCamera(scene: Game): GameCamera {
 //     return new GameCamera(scene);
 // }
-// export function setupCamera(scene: Game): void {
-// //
-// }
+export function setupCamera(scene: Game): void {
+    const areaSize = scene.objectByAreaId[scene.levelData.areaId].area;
+    console.log(areaSize);
+
+    scene.cameras.main.setBounds(
+        areaSize.x,
+        areaSize.y - areaSize.height,
+        areaSize.width,
+        areaSize.height
+    );
+
+    // Set initial zoom level
+    scene.cameras.main.setZoom(1.8);
+
+    // Add these settings to smooth out camera movement
+    scene.cameras.main.setRoundPixels(true);
+    scene.cameras.main.setLerp(0.1, 0.1); // Smooth camera movement
+    scene.cameras.main.setFollowOffset(
+        -areaSize.width / 2,
+        -areaSize.height / 2
+    );
+
+    // Start following player with smoother parameters
+    scene.cameras.main.startFollow(
+        scene.player,
+        true, // Round pixels
+        0.1, // Lerp X
+        0.1 // Lerp Y
+    );
+}

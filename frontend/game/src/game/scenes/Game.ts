@@ -8,7 +8,7 @@ import { EnimieSlime } from "../entities/enimies/enimieSlime";
 import { CharactrerGameObject } from "../components/gameobject/common/characterGameObject";
 import { DIRECTION } from "../../common/common";
 import { DEBUG_COLLISION_ALPHA, PLAYER_START_MAX_HEALTH } from "../../config";
-import { LevelData } from "../types/types";
+import { Direction, LevelData } from "../types/types";
 import { TiledAreaObject } from "../tiled/types";
 import { TILED_LAYER_NAMES } from "../tiled/common";
 import {
@@ -63,7 +63,6 @@ export class Game extends Scene {
         // 4. Setup camera bounds and follow
 
         // setupControls(this, this.gameCamera);
-        this.physics.world.createDebugGraphic();
 
         const areaSize = this.objectByAreaId[this.levelData.areaId].area;
         console.log(areaSize);
@@ -187,6 +186,7 @@ export class Game extends Scene {
             this.player,
             this.passageTransitionGroup,
             (playerObj, passageObj) => {
+                console.log("ovelapped");
                 this.handlePassageTransition(
                     passageObj as Phaser.Types.Physics.Arcade.GameObjectWithBody
                 );
@@ -236,10 +236,12 @@ export class Game extends Scene {
     private handlePassageTransition(
         passageTrigger: Phaser.Types.Physics.Arcade.GameObjectWithBody
     ): void {
+        console.log("asdfads");
+        console.log("asdfads");
         const passage = this.objectByAreaId[this.currentAreaId].passageMap[
             passageTrigger.name
         ] as Passage;
-
+        console.log(passage.targetareaId);
         const targetPassage = this.objectByAreaId[passage.targetareaId]
             .passageMap[passage.targetPassageId] as Passage;
         passage.disableObject();
@@ -248,117 +250,136 @@ export class Game extends Scene {
             passage,
             targetPassage
         );
-        console.log("targetDirection for going ");
         console.log(targetDirection);
-        console.log(passage);
-        console.log(targetPassage);
-        const differenceBetweenPassage = {
-            x: Math.abs(
-                passage.passageTransitionZone.x -
-                    targetPassage.passageTransitionZone.x
-            ),
-            y: Math.abs(
-                passage.passageTransitionZone.y -
-                    targetPassage.passageTransitionZone.y
-            ),
-        };
-        console.log("differnces between passages");
-        console.log(differenceBetweenPassage);
-        //for getting the correct direction based values
-        if (targetDirection === DIRECTION.UP) {
-            differenceBetweenPassage.y *= -1;
-        }
-        if (targetDirection === DIRECTION.LEFT) {
-            differenceBetweenPassage.x *= -1;
-        }
-        //
-        console.log(passage.x, passage.y);
-        //   For X: Add half the zone width to center horizontally
-        // For Y: Subtract half the zone height to center vertically
-        const playerTargetPosition = {
-            x:
-                passage.x +
-                passage.passageTransitionZone.width / 2 +
-                differenceBetweenPassage.x,
-            y:
-                passage.y -
-                passage.passageTransitionZone.height / 2 +
-                differenceBetweenPassage.y,
-        };
-        console.log(playerTargetPosition);
-        this.tweens.add({
-            targets: this.player,
-            y: playerTargetPosition.y,
-            x: playerTargetPosition.x,
-            duration: 900,
-            delay: 250,
-        });
-        const areaSize = this.objectByAreaId[targetPassage.areaId].area;
-        console.log("areaSize of target");
-        console.log(areaSize);
-        this.cameras.main.setBounds(
-            this.cameras.main.worldView.x,
-            this.cameras.main.worldView.y,
-            this.cameras.main.worldView.width,
-            this.cameras.main.worldView.height
+        this.input.enabled = false;
+        this.startPassageTransition(passage, targetPassage, targetDirection);
+    }
+    private startPassageTransition(
+        passage: Passage,
+        targetPassage: Passage,
+        dir: Direction
+    ): void {
+        // Disable player input during transition
+        this.input.enabled = false;
+
+        // Create transition overlay with position based on direction
+        const transitionScreen = this.add.rectangle(
+            0,
+            0,
+            this.cameras.main.width,
+            this.cameras.main.height,
+            0x000000
         );
-        const bounds = this.cameras.main.getBounds();
-        this.cameras.main.stopFollow();
+        transitionScreen.setScrollFactor(0).setDepth(9999).setOrigin(0);
 
-        this.tweens.add({
-            targets: bounds,
-            x: areaSize.x,
-            y: areaSize.y - areaSize.height,
-            duration: 900,
-            delay: 250,
-            onUpdate: () => {
-                this.cameras.main.setBounds(
-                    bounds.x,
-                    bounds.y,
-                    areaSize.width,
-                    areaSize.height
-                );
-            },
-        });
-
-        const playerDistanceToMoveIntoArea = {
-            x: differenceBetweenPassage.x,
-            y: differenceBetweenPassage.y,
-        };
-        if (
-            targetDirection === DIRECTION.UP ||
-            targetDirection === DIRECTION.DOWN
-        ) {
-            playerDistanceToMoveIntoArea.y = Math.max(
-                Math.abs(playerDistanceToMoveIntoArea.y),
-                30
-            );
-            if (targetDirection === DIRECTION.UP) {
-                playerDistanceToMoveIntoArea.y *= -1;
-            }
-        } else {
-            playerDistanceToMoveIntoArea.x = Math.max(
-                Math.abs(playerDistanceToMoveIntoArea.x),
-                0
-            );
-            if (targetDirection === DIRECTION.LEFT) {
-                playerDistanceToMoveIntoArea.x *= -1;
-            }
+        // Position the black screen outside the viewport based on direction
+        if (dir === DIRECTION.UP) {
+            transitionScreen.y = this.cameras.main.height; // Position below the screen
+        } else if (dir === DIRECTION.DOWN) {
+            transitionScreen.y = -this.cameras.main.height; // Position above the screen
+        } else if (dir === DIRECTION.LEFT) {
+            transitionScreen.x = this.cameras.main.width; // Position to the right
+        } else if (dir === DIRECTION.RIGHT) {
+            transitionScreen.x = -this.cameras.main.width; // Position to the left
         }
 
+        // Slide in the black screen from the appropriate direction
         this.tweens.add({
-            targets: this.player,
-            y: playerTargetPosition.y + playerDistanceToMoveIntoArea.y,
-            x: playerTargetPosition.x + playerDistanceToMoveIntoArea.x,
-            duration: 901,
-            delay: 250,
+            targets: transitionScreen,
+            x: 0,
+            y: 0,
+            duration: 500,
+            ease: "Cubic.easeInOut",
             onComplete: () => {
-                targetPassage.enableObject();
-                this.currentAreaId = targetPassage.areaId;
-                this.cameras.main.startFollow(this.player);
+                this.changeArea(passage, targetPassage, dir, transitionScreen);
             },
         });
     }
+
+    private changeArea(
+        passage: Passage,
+        targetPassage: Passage,
+        dir: Direction,
+        transitionScreen: Phaser.GameObjects.Rectangle
+    ) {
+        this.currentAreaId = targetPassage.areaId;
+
+        // Calculate player position
+        const passageWidth = targetPassage.passageTransitionZone.width || 32;
+        const passageHeight = targetPassage.passageTransitionZone.height || 32;
+        const playerWidth = this.player.width || 32;
+        const playerHeight = this.player.height || 32;
+        const offset = 20;
+
+        let playerX = targetPassage.x;
+        let playerY = targetPassage.y;
+
+        // Position player based on direction
+        if (targetPassage.direction === DIRECTION.UP) {
+            playerX += passageWidth / 2 - playerWidth / 2;
+            playerY += passageHeight + offset;
+        } else if (targetPassage.direction === DIRECTION.DOWN) {
+            playerX += passageWidth / 2 - playerWidth / 2;
+            playerY -= playerHeight + offset;
+        } else if (targetPassage.direction === DIRECTION.LEFT) {
+            playerX += passageWidth + offset;
+            playerY += passageHeight / 2 - playerHeight / 2;
+        } else if (targetPassage.direction === DIRECTION.RIGHT) {
+            playerX -= playerWidth + offset;
+            playerY += passageHeight / 2 - playerHeight / 2;
+        }
+
+        // Set player position
+        this.player.x = playerX;
+        this.player.y = playerY;
+
+        // Update area bounds
+        const areaSize = this.objectByAreaId[this.currentAreaId].area;
+        this.cameras.main.setBounds(
+            areaSize.x,
+            areaSize.y - areaSize.height,
+            areaSize.width,
+            areaSize.height
+        );
+
+        passage.enableObject();
+        targetPassage.enableObject();
+
+        // Short delay before revealing the new area
+        this.time.delayedCall(300, () => {
+            // Calculate exit direction (opposite of entry)
+            let exitX = 0;
+            let exitY = 0;
+
+            // Set exit position based on passage direction
+            if (targetPassage.direction === DIRECTION.UP) {
+                exitY = -this.cameras.main.height; // Exit upward
+            } else if (targetPassage.direction === DIRECTION.DOWN) {
+                exitY = this.cameras.main.height; // Exit downward
+            } else if (targetPassage.direction === DIRECTION.LEFT) {
+                exitX = -this.cameras.main.width; // Exit to the left
+            } else if (targetPassage.direction === DIRECTION.RIGHT) {
+                exitX = this.cameras.main.width; // Exit to the right
+            }
+
+            // Slide out the black screen in the exit direction
+            this.tweens.add({
+                targets: transitionScreen,
+                x: exitX,
+                y: exitY,
+                duration: 500,
+                ease: "Cubic.easeInOut",
+                onComplete: () => {
+                    // Clean up
+                    transitionScreen.destroy();
+
+                    // Re-enable player controls
+                    this.input.enabled = true;
+                },
+            });
+        });
+    }
+
     update(_time: number, delta: number) {
         // Update global time
         globalTime.updateTime(delta);

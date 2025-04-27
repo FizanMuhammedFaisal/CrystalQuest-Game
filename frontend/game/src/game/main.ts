@@ -1,7 +1,5 @@
 import Phaser, { Game } from "phaser";
 import * as scenes from "./scenes";
-import GridEngine from "grid-engine";
-import DayNightPipeline from "./shaders/DayNightPipeline";
 
 const config: Phaser.Types.Core.GameConfig = {
     width: 1024, // 1024
