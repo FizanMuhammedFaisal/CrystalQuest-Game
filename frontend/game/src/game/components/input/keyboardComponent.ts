@@ -46,11 +46,11 @@ export class KeyboardComponent extends InputComponent {
         return this.cursorKeys.right.isDown || this.keyD.isDown;
     }
 
-    get iskeyboardActionKeyJustDown(): boolean {
+    get isActionKeyJustDown(): boolean {
         return Phaser.Input.Keyboard.JustDown(this.keyboardActionKey);
     }
 
-    get iskeyboardAttackKeyJustDown(): boolean {
+    get isAttackKeyJustDown(): boolean {
         return Phaser.Input.Keyboard.JustDown(this.keyboardAttackKey);
     }
 
@@ -58,7 +58,7 @@ export class KeyboardComponent extends InputComponent {
         return Phaser.Input.Keyboard.JustDown(this.cursorKeys.shift);
     }
 
-    get iskeyboardAnterKeyJustDown(): boolean {
+    get isEnterKeyJustDown(): boolean {
         return Phaser.Input.Keyboard.JustDown(this.keyboardAnterKey);
     }
 }

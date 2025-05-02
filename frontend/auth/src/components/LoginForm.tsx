@@ -113,7 +113,7 @@ export function LoginForm() {
               </div>
               <div className='text-sm'>
                 <a
-                  href='#'
+                  href='/auth/forgot'
                   className='font-pixel text-xs text-[#4ADE80] hover:text-[#22C55E]'
                 >
                   FORGOT PASSWORD?

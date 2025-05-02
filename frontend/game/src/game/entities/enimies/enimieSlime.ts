@@ -78,7 +78,7 @@ export class EnimieSlime extends CharactrerGameObject {
             HURT_DOWN: {
                 key: ENIMIE_SLIME_ANIMATION_KEYS.HURT_DOWN,
                 repeat: 0,
-                ignoreIfPlaying: true,
+                ignoreIfPlaying: false,
             },
             HURT_UP: {
                 key: ENIMIE_SLIME_ANIMATION_KEYS.HURT_UP,
@@ -140,8 +140,11 @@ export class EnimieSlime extends CharactrerGameObject {
         this._stateMachine.addState(new IdleState(this));
         this._stateMachine.addState(new MoveState(this));
         this._stateMachine.addState(
-            new HurtState(this, ENIMIE_SLIME_HURT_PUSH_BACK_SPEED) as State
+            new HurtState(this, ENIMIE_SLIME_HURT_PUSH_BACK_SPEED, () => {
+                console.log("enimie hurt");
+            }) as State
         );
+
         this._stateMachine.addState(new DeathState(this));
         this._stateMachine.setState(CHARACTER_STATES.IDLE_STATE);
 
@@ -153,7 +156,6 @@ export class EnimieSlime extends CharactrerGameObject {
     }
 
     private findPlayer(): void {
-        // Find the player in the scene - assuming it has an id of "player"
         this.player = this._scene.children
             .getChildren()
             .find(
@@ -178,7 +180,8 @@ export class EnimieSlime extends CharactrerGameObject {
             this.player.x,
             this.player.y
         );
-
+        // console.log(distance);
+        // console.log(this.followingPlayer);
         // Check if player is within detection radius
         if (distance <= this.detectionRadius) {
             this.followingPlayer = true;

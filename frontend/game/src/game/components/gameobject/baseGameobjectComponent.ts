@@ -15,7 +15,9 @@ export class BaseGameobjectComponent {
     //genius pattern so a component inheriting this callled health
     // when a object is passed to this health class the object will have a
     // health's refecne with name "health"
-    protected assignComponentToObject(object: GameObject): void {
+    protected assignComponentToObject(
+        object: GameObject | Phaser.Physics.Arcade.Body
+    ): void {
         object[`_${this.constructor.name}`] = this;
     }
     //getting the setted value

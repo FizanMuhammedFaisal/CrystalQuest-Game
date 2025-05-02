@@ -8,6 +8,14 @@ declare module 'auth/Auth' {
   export default Auth
 }
 
+declare module 'auth/Navbar' {
+  interface NavbarProps {
+    navigate: NavigateFunction
+  }
+  const Navbar: React.ComponentType<NavbarProps>
+  export default Navbar
+}
+
 declare module 'dashboard/Dashboard' {
   const Dashboard: React.ComponentType
   export default Dashboard

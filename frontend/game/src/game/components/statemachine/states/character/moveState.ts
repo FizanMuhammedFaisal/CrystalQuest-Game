@@ -24,7 +24,10 @@ export class MoveState extends BaseCharacterState {
 
     onUpdate(): void {
         const controls = this._gameObject.controls;
-
+        if (controls.isAttackKeyJustDown) {
+            this._stateMachine.setState(CHARACTER_STATES.ATTACK_STATE);
+            return;
+        }
         if (
             !controls.isUpDown &&
             !controls.isDownDown &&
@@ -34,6 +37,7 @@ export class MoveState extends BaseCharacterState {
             this._stateMachine.setState(CHARACTER_STATES.IDLE_STATE);
             return;
         }
+
         if (controls.isUpDown) {
             this.updateVelocity(false, -1);
             this.updateDirection(DIRECTION.UP);

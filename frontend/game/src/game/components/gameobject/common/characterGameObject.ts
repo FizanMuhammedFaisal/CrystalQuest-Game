@@ -6,7 +6,7 @@ import { DirectionComponent } from "../directionComponent";
 import { SpeedsComponent } from "../speedComponent";
 import { StateMachine } from "../../statemachine/statemachine";
 import { ControlsComponent } from "../controlsComponent";
-import { GameScene } from "../../../types/scenes";
+
 import { InputComponent } from "../../input/inputComponent";
 
 import { Direction } from "../../../types/types";
@@ -14,7 +14,7 @@ import { InvulnarableComponent } from "../invulnarableComponent";
 import { CHARACTER_STATES } from "../../statemachine/states/character/characterStates";
 import { LifeComponent } from "../lifeComponent";
 type CharacterConfig = {
-    scene: GameScene;
+    scene: Phaser.Scene;
     positions: { x: number; y: number };
     assetKey: string;
     inputComponent: InputComponent;
@@ -83,7 +83,7 @@ export abstract class CharactrerGameObject extends Phaser.Physics.Arcade
         this._idDefeated = false;
     }
     get isDefeated(): boolean {
-        return this._idDefeated;
+        return this._isDefeated;
     }
     get controls(): InputComponent {
         return this._controlsComponent.controls;

@@ -2,6 +2,6 @@ export const DEPTH = {
     GROUND: 0,
     WORLD: 1,
     PLAYER: 2,
-    OVERLAY: 3,
-    COLLISION: 4,
+    OVERLAY: 8,
+    COLLISION: 10,
 } as const;

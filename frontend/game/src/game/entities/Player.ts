@@ -8,6 +8,7 @@ import { AnimationConfig } from "../components/gameobject/animationComponent";
 import { ASSET_KEYS, PLAYER_ANIMATION_KEYS } from "../../common/assets";
 import { CharactrerGameObject } from "../components/gameobject/common/characterGameObject";
 import {
+    PLAYER_ATTACK_DAMAGE,
     PLAYER_HURT_PUSH_BACK_SPEED,
     PLAYER_INVULNARABLE_AFTER_HIT_ANIMATION_DURATION,
     PLAYER_SPEED,
@@ -15,6 +16,10 @@ import {
 import { HurtState } from "../components/statemachine/states/character/hurtState";
 import { State } from "../components/statemachine/statemachine";
 import { DeathState } from "../components/statemachine/states/character/deathState";
+import { AttackState } from "../components/statemachine/states/character/attackState";
+import { Weapon } from "../components/gameobject/weapon/baseWeapon";
+import { WeaponComponent } from "../components/gameobject/weaponComponent";
+import { Sword } from "../components/gameobject/weapon/sword";
 type TPlayer = {
     scene: Scene;
     positions: { x: number; y: number };
@@ -23,6 +28,7 @@ type TPlayer = {
     currentLife?: number;
 };
 export class Player extends CharactrerGameObject {
+    private weaponComponent: Weapon;
     constructor(config: TPlayer) {
         const animationConfig: AnimationConfig = {
             WALK_DOWN: {
@@ -125,6 +131,18 @@ export class Player extends CharactrerGameObject {
 
         this.setCollideWorldBounds(true);
 
+        this.weaponComponent = new WeaponComponent(this);
+        this.weaponComponent.weapon = new Sword(
+            this,
+            this.weaponComponent,
+            {
+                DOWN: PLAYER_ANIMATION_KEYS.SWORD_1_ATTACK_DOWN,
+                UP: PLAYER_ANIMATION_KEYS.SWORD_1_ATTACK_UP,
+                LEFT: PLAYER_ANIMATION_KEYS.SWORD_1_ATTACK_SIDE,
+                RIGHT: PLAYER_ANIMATION_KEYS.SWORD_1_ATTACK_SIDE,
+            },
+            PLAYER_ATTACK_DAMAGE
+        );
         this._stateMachine.addState(new IdleState(this));
         this._stateMachine.addState(new MoveState(this));
         this._stateMachine.addState(
@@ -132,6 +150,8 @@ export class Player extends CharactrerGameObject {
                 console.log("hurt");
             }) as State
         );
+        this._stateMachine.addState(new AttackState(this));
+
         this._stateMachine.addState(new DeathState(this));
         this._stateMachine.setState(CHARACTER_STATES.IDLE_STATE);
 
@@ -151,5 +171,12 @@ export class Player extends CharactrerGameObject {
 
     get physicsBody(): Phaser.Physics.Arcade.Body {
         return this.body as Phaser.Physics.Arcade.Body;
+    }
+    get weaponCompoent(): WeaponComponent {
+        return this.weaponComponent;
+    }
+    public update(): void {
+        this.weaponComponent.update();
+        super.update();
     }
 }

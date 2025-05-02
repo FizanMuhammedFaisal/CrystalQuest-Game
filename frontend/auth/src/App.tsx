@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { LoginForm } from './components/LoginForm'
 import { SignupForm } from './components/SignupForm'
 import J from './components/J'
+import { ForgotPasswordForm } from './components/ForgotPassword'
 
 const routes = [
   {
@@ -15,6 +16,10 @@ const routes = [
   {
     path: '/j',
     element: <J />
+  },
+  {
+    path: '/forgot',
+    element: <ForgotPasswordForm />
   }
 ]
 

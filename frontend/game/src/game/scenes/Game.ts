@@ -19,12 +19,12 @@ import {
 } from "../tiled/tiled-utils";
 import { Passage } from "../components/gameobject/objects/passage";
 import { getDirectionOfObjectFromAnotherObject } from "../../common/utils";
+import { InventoryManager } from "../components/inventory/inventoryManager";
 
 export class Game extends Scene {
     public tilemap: Phaser.Tilemaps.Tilemap;
     private layers: GameLayers;
     public player: Player;
-    public enimieGroup: Phaser.GameObjects.Group;
     private controls!: KeyboardComponent;
     public levelData: LevelData;
     private collitionLayer: Phaser.Tilemaps.TilemapLayer;
@@ -44,9 +44,9 @@ export class Game extends Scene {
     public init(data: LevelData): void {
         this.levelData = data;
         this.currentAreaId = data.areaId;
+        console.log(InventoryManager.instance);
     }
-    // setupFountainStone(this);
-    // spawnCrystals(0.9, this);
+
     create() {
         this.tilemap = this.make.tilemap({ key: "game-map" });
         if (!this.input.keyboard) {
@@ -55,7 +55,7 @@ export class Game extends Scene {
         this.controls = new KeyboardComponent(this.input.keyboard);
         this.layers = setupLayers(this);
         this.setupPlayer();
-        this.player.setDepth(0);
+        this.player.setDepth(3);
         setupDepths(this.layers);
         this.createLevel();
 
@@ -81,12 +81,12 @@ export class Game extends Scene {
         // );
         this.physics.world.setBounds(0, 0, 9999, 9999);
 
-        this.cameras.main.setZoom(1.8);
+        this.cameras.main.setZoom(2.8);
 
-        this.cameras.main.setFollowOffset(
-            -areaSize.width / 2,
-            -areaSize.height / 2
-        );
+        // this.cameras.main.setFollowOffset(
+        //     -areaSize.width / 2,
+        //     -areaSize.height / 2
+        // );
 
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     }
@@ -101,15 +101,6 @@ export class Game extends Scene {
             return;
         }
 
-        this.enimieGroup = this.add.group(
-            new EnimieSlime({
-                scene: this,
-                positions: { x: 330, y: 110 },
-            }),
-            {
-                // runChildUpdate: true,
-            }
-        );
         const collitionLayer = this.tilemap.createLayer(
             TILED_LAYER_NAMES.COLLISION,
             [collitionTiled],
@@ -158,45 +149,56 @@ export class Game extends Scene {
     private setupPlayer() {
         this.player = new Player({
             scene: this,
-            positions: { x: 400, y: 900 },
+            positions: { x: 400, y: 200 },
             controls: this.controls,
             maxLife: PLAYER_START_MAX_HEALTH,
             currentLife: PLAYER_START_MAX_HEALTH,
         });
     }
     private registerColliders(): void {
-        this.enimieGroup.getChildren().forEach((enimie) => {
-            const enemyGameObject = enimie as CharactrerGameObject;
-            enemyGameObject.setCollideWorldBounds(true);
-        });
-        this.physics.add.overlap(
-            this.player,
-            this.enimieGroup,
-            (player, enemy) => {
-                this.player.hit(DIRECTION.DOWN, 1);
-                const enemyGameObject = enemy as CharactrerGameObject;
-                enemyGameObject.hit(this.player.direction, 1);
-            }
-        );
         this.collitionLayer.setCollision(
             this.collitionLayer.tileset[0].firstgid
         );
         this.physics.add.collider(this.player, this.collitionLayer);
+
         this.physics.add.overlap(
             this.player,
             this.passageTransitionGroup,
             (playerObj, passageObj) => {
-                console.log("ovelapped");
                 this.handlePassageTransition(
                     passageObj as Phaser.Types.Physics.Arcade.GameObjectWithBody
                 );
             }
         );
+
+        Object.keys(this.objectByAreaId).forEach((key) => {
+            const areaId = parseInt(key);
+            if (this.objectByAreaId[areaId] === undefined) {
+                return;
+            }
+            if (this.objectByAreaId[areaId].enemyGroup !== undefined) {
+                this.objectByAreaId[areaId].enemyGroup
+                    .getChildren()
+                    .forEach((enimie) => {
+                        const enemyGameObject = enimie as CharactrerGameObject;
+                        enemyGameObject.setCollideWorldBounds(true);
+                    });
+                this.physics.add.overlap(
+                    this.player,
+                    this.objectByAreaId[areaId].enemyGroup,
+                    (player, enemy) => {
+                        this.player.hit(DIRECTION.DOWN, 1);
+                        const enemyGameObject = enemy as CharactrerGameObject;
+                        enemyGameObject.hit(this.player.direction, 1);
+                    }
+                );
+            }
+        });
     }
 
     private createAreas(map: Phaser.Tilemaps.Tilemap, layerName: string): void {
         const validTiledObjects = getTiledAreaObjectsFromMap(map, layerName);
-
+        console.log(validTiledObjects);
         validTiledObjects.forEach((tiledObject) => {
             this.objectByAreaId[tiledObject.id] = {
                 passageMap: {},
@@ -220,7 +222,8 @@ export class Game extends Scene {
 
         validTiledObjects.forEach((tiledObject) => {
             const passage = new Passage(this, tiledObject, areaId);
-            console.log(this.objectByAreaId[areaId]);
+            console.log(areaId);
+            console.log(this.objectByAreaId);
             this.objectByAreaId[areaId].passage.push(passage);
             this.objectByAreaId[areaId].passageMap[tiledObject.id] = passage;
             this.passageTransitionGroup.add(passage.passageTransitionZone);
@@ -232,6 +235,30 @@ export class Game extends Scene {
         areaId: number
     ): void {
         const validTiledObjects = getTiledEnemyObjectsFromMap(map, layerName);
+        console.log(validTiledObjects);
+        if (this.objectByAreaId[areaId].enemyGroup === undefined) {
+            this.objectByAreaId[areaId].enemyGroup = this.add.group([], {
+                runChildUpdate: true,
+            });
+        }
+
+        for (const tiledObject of validTiledObjects) {
+            if (
+                tiledObject.type !== 1 &&
+                tiledObject.type !== 2 &&
+                tiledObject.type !== 3
+            ) {
+                continue;
+            }
+            if (tiledObject.type === 1) {
+                const slimeEnimie = new EnimieSlime({
+                    scene: this,
+                    positions: { x: tiledObject.x, y: tiledObject.y },
+                });
+                this.objectByAreaId[areaId].enemyGroup?.add(slimeEnimie);
+                continue;
+            }
+        }
     }
     private handlePassageTransition(
         passageTrigger: Phaser.Types.Physics.Arcade.GameObjectWithBody
@@ -304,7 +331,7 @@ export class Game extends Scene {
     ) {
         this.currentAreaId = targetPassage.areaId;
 
-        // Calculate player position
+        // player position
         const passageWidth = targetPassage.passageTransitionZone.width || 32;
         const passageHeight = targetPassage.passageTransitionZone.height || 32;
         const playerWidth = this.player.width || 32;
@@ -314,7 +341,6 @@ export class Game extends Scene {
         let playerX = targetPassage.x;
         let playerY = targetPassage.y;
 
-        // Position player based on direction
         if (targetPassage.direction === DIRECTION.UP) {
             playerX += passageWidth / 2 - playerWidth / 2;
             playerY += passageHeight + offset;
@@ -329,11 +355,9 @@ export class Game extends Scene {
             playerY += passageHeight / 2 - playerHeight / 2;
         }
 
-        // Set player position
         this.player.x = playerX;
         this.player.y = playerY;
 
-        // Update area bounds
         const areaSize = this.objectByAreaId[this.currentAreaId].area;
         this.cameras.main.setBounds(
             areaSize.x,
@@ -346,7 +370,7 @@ export class Game extends Scene {
         targetPassage.enableObject();
 
         // Short delay before revealing the new area
-        this.time.delayedCall(300, () => {
+        this.time.delayedCall(100, () => {
             // Calculate exit direction (opposite of entry)
             let exitX = 0;
             let exitY = 0;
@@ -362,18 +386,15 @@ export class Game extends Scene {
                 exitX = this.cameras.main.width; // Exit to the right
             }
 
-            // Slide out the black screen in the exit direction
             this.tweens.add({
                 targets: transitionScreen,
                 x: exitX,
                 y: exitY,
-                duration: 500,
-                ease: "Cubic.easeInOut",
+                duration: 800,
+                ease: "Back.easeIn",
+                easeParams: [1.7],
                 onComplete: () => {
-                    // Clean up
                     transitionScreen.destroy();
-
-                    // Re-enable player controls
                     this.input.enabled = true;
                 },
             });
@@ -385,6 +406,6 @@ export class Game extends Scene {
         globalTime.updateTime(delta);
         // console.log(this.player.depth);
         // this.gameCamera.update(this);
-        console.log(this.player.x, this.player.y);
+        // console.log(this.player.x, this.player.y);
     }
 }

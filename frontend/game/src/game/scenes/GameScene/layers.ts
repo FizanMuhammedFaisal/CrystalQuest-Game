@@ -37,6 +37,7 @@ export function setupLayers(scene: Game): GameLayers {
             tilesTileset,
             TreesTileset,
             WoodWallsTileset,
+            GroundSetTileset,
         ])!,
         overlay: scene.tilemap.createLayer("OverlayLayer", [
             TreesTileset,

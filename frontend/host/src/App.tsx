@@ -1,5 +1,6 @@
 import {
   createBrowserRouter,
+  Outlet,
   RouterProvider,
   useNavigate
 } from 'react-router-dom'
@@ -17,6 +18,11 @@ const DashBoard = lazy(() =>
 )
 const Auth = lazy(() =>
   import('auth/Auth').catch(() => ({
+    default: () => <div>Failed to load Auth</div>
+  }))
+)
+const Navbar = lazy(() =>
+  import('auth/Navbar').catch(() => ({
     default: () => <div>Failed to load Auth</div>
   }))
 )
@@ -44,23 +50,42 @@ const GameLaunchWrapper = () => {
     </Suspense>
   )
 }
+const Layout = () => {
+  const navigate = useNavigate()
 
+  return (
+    <div className='min-h-screen'>
+      <Suspense fallback={<LoadingComponent />}>
+        <Navbar navigate={navigate} />
+      </Suspense>
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  )
+}
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <GameLaunchWrapper />
-  },
-  {
-    path: '/game',
-    element: <LazyComponent Component={Game} />
-  },
-  {
-    path: 'auth/*',
-    element: <Auth />
+    element: <Layout />,
+    children: [
+      {
+        path: '/',
+        element: <GameLaunchWrapper />
+      },
+
+      {
+        path: 'auth/*',
+        element: <Auth />
+      }
+    ]
   },
   {
     path: 'dashboard',
     element: <LazyComponent Component={DashBoard} />
+  },
+  {
+    path: '/game',
+    element: <LazyComponent Component={Game} />
   }
 ])
 
@@ -69,3 +94,53 @@ function App() {
 }
 
 export default App
+
+// projecttedremoteComponent.tsx
+// export default App
+// import { useEffect, useState } from 'react'
+// import { useNavigate } from 'react-router-dom'
+// import { useAuth } from './auth/useAuth' // your custom auth hook
+
+// const ProtectedRemoteComponent = ({ remotePath }: { remotePath: string }) => {
+//   const [Component, setComponent] = useState<React.ComponentType | null>(null)
+//   const { isAuthenticated } = useAuth()
+//   const navigate = useNavigate()
+
+//   useEffect(() => {
+//     if (!isAuthenticated) {
+//       navigate('/auth/login')
+//       return
+//     }
+
+//     // Dynamically load the remote module AFTER auth check
+//     import(remotePath)
+//       .then(mod => {
+//         setComponent(() => mod.default)
+//       })
+//       .catch(err => {
+//         console.error('Remote load failed:', err)
+//         setComponent(() => () => <div>Failed to load remote</div>)
+//       })
+//   }, [isAuthenticated, navigate, remotePath])
+
+//   if (!Component) return <div>Loading...</div>
+//   return <Component />
+// }
+// const router = createBrowserRouter([
+//   {
+//     path: '/',
+//     element: <GameLaunchWrapper />
+//   },
+//   {
+//     path: '/game',
+//     element: <ProtectedRemoteComponent remotePath='game/Game' />
+//   },
+//   {
+//     path: 'auth/*',
+//     element: <Auth />
+//   },
+//   {
+//     path: 'dashboard',
+//     element: <ProtectedRemoteComponent remotePath='dashboard/Dashboard' />
+//   }
+// ])

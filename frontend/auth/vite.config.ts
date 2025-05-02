@@ -14,7 +14,8 @@ export default defineConfig({
         game: 'http://localhost:8080/assets/remoteEntry.js'
       },
       exposes: {
-        './Auth': './src/App.tsx'
+        './Auth': './src/App.tsx',
+        './Navbar': './src/components/Navbar.tsx'
       },
       shared: ['react', 'react-dom', 'react-router-dom']
     })

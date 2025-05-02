@@ -56,6 +56,7 @@ export class HurtState extends BaseCharacterState {
         );
         this._gameObject.invalueableComponent.invulnarable = true;
         this.onHurtCallback();
+
         this._gameObject.animationComponent.playAnimation(
             CHARACTER_ANIMATIONS.HURT_DOWN,
             () => {
@@ -71,6 +72,8 @@ export class HurtState extends BaseCharacterState {
                 this._gameObject.invalueableComponent.invulnarable = false;
             }
         );
+        console.log(this._gameObject.id);
+        console.log(this.nextState);
         this._stateMachine.setState(this.nextState);
     }
 }
