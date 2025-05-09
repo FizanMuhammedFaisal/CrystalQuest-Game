@@ -3,11 +3,14 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "TiesPreph.tmx",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
+        "": {
+            "scaleInEditor": 1
+        },
         "/Users/fizanmuhammedfaisal/Downloads/phaser-zelda-like-tutorial-additional-assets/tiled/world.tmx": {
             "expandedGroupLayers": [
                 20
@@ -116,17 +119,68 @@
         },
         "Projects/Project-Pre(PH)/frontend/game/src/assets/tmx file/TiesPreph.tmx#trees": {
             "scaleInDock": 1
+        },
+        "TiesPreph.tmx": {
+            "expandedGroupLayers": [
+                16,
+                13,
+                20,
+                23,
+                14
+            ],
+            "scale": 0.6661,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 559.2253415403093,
+                "y": 1420.2071760996846
+            }
+        },
+        "TiesPreph.tmx#CollisionTiles": {
+            "scaleInDock": 2.33
+        },
+        "TiesPreph.tmx#Collition": {
+            "scaleInDock": 2.33
+        },
+        "TiesPreph.tmx#Grass": {
+            "scaleInDock": 2.33
+        },
+        "TiesPreph.tmx#GroundSet": {
+            "scaleInDock": 2.33
+        },
+        "TiesPreph.tmx#Tiles": {
+            "scaleInDock": 2.33
+        },
+        "TiesPreph.tmx#WoodWalls": {
+            "scaleInDock": 2.33
+        },
+        "TiesPreph.tmx#bridge": {
+            "scaleInDock": 2.33
+        },
+        "TiesPreph.tmx#grass2": {
+            "scaleInDock": 2.33
+        },
+        "TiesPreph.tmx#trees": {
+            "scaleInDock": 1.2391
         }
     },
-    "last.exportedFilePath": "/Users/fizanmuhammedfaisal/Projects/Projects/Project-Pre(PH)/frontend/game/src/assets/tilemaps",
+    "last.exportedFilePath": "/Users/fizanmuhammedfaisal/Projects/Projects/Project-Pre-PH/frontend/game/src/assets/tilemaps",
+    "last.imagePath": "/Users/fizanmuhammedfaisal/Projects/Projects/Project-Pre-PH/frontend/game/src/assets/tilesets",
     "last.objectTypesPath": "/Users/fizanmuhammedfaisal/Projects/Projects/Project-Pre(PH)/frontend/game/src/assets/tmx file/propertytypes.json",
     "map.lastUsedExportFilter": "All Files (*)",
+    "map.lastUsedFormat": "tmx",
     "openFiles": [
+        "TiesPreph.tmx"
     ],
     "project": "tiled.tiled-project",
     "property.type": "int",
     "recentFiles": [
+        "TiesPreph.tmx",
         "/Users/fizanmuhammedfaisal/Projects/Projects/Project-Pre(PH)/frontend/game/src/assets/tmx file/TiesPreph.tiled.tmx",
         "/Users/fizanmuhammedfaisal/Projects/Projects/Project-Pre(PH)/frontend/game/src/assets/tmx file/TiesPreph.tmx"
-    ]
+    ],
+    "tileset.embedInMap": true,
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
 }

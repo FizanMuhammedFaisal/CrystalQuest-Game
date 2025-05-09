@@ -20,6 +20,7 @@ import { AttackState } from "../components/statemachine/states/character/attackS
 import { Weapon } from "../components/gameobject/weapon/baseWeapon";
 import { WeaponComponent } from "../components/gameobject/weaponComponent";
 import { Sword } from "../components/gameobject/weapon/sword";
+import { Torch } from "../components/gameobject/weapon/torch";
 type TPlayer = {
     scene: Scene;
     positions: { x: number; y: number };
@@ -148,6 +149,24 @@ export class Player extends CharactrerGameObject {
         this._stateMachine.addState(
             new HurtState(this, PLAYER_HURT_PUSH_BACK_SPEED, () => {
                 console.log("hurt");
+
+                const originalAlpha = this.alpha;
+                this.scene.cameras.main.shake(100, 0.002);
+                this.setTint(0xffffff);
+
+                this.setBlendMode(Phaser.BlendModes.ADD);
+
+                this.scene.tweens.add({
+                    targets: this,
+                    alpha: { from: 1.5, to: 0.8, yoyo: true },
+                    duration: 80,
+                    repeat: 2,
+                    onComplete: () => {
+                        this.clearTint();
+                        this.setBlendMode(Phaser.BlendModes.NORMAL);
+                        this.setAlpha(originalAlpha);
+                    },
+                });
             }) as State
         );
         this._stateMachine.addState(new AttackState(this));

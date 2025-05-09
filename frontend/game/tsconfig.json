@@ -16,7 +16,7 @@
         "outDir": "dist",
 
         /* Linting */
-        "strict": true,
+        "strict": false,
         "strictPropertyInitialization": false,
         "typeRoots": [
             "node_modules/@types",

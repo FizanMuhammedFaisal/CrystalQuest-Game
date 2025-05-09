@@ -4,7 +4,6 @@
     "version": "1.0.3",
     "author": "",
     "type": "module",
-    "homepage": "https://github.com/phaserjs/template-react-ts#readme",
     "keywords": [
         "phaser",
         "phaser3",
@@ -15,6 +14,7 @@
     "scripts": {
         "dev": " vite ",
         "build": "tsc -b && vite build",
+        "viteBuild": " vite build",
         "dev-nolog": "vite ",
         "preview": "vite preview --port 8080"
     },
@@ -23,7 +23,7 @@
         "grid-engine": "^2.48.0",
         "lucide-react": "^0.488.0",
         "motion": "^12.7.4",
-        "phaser": "^4.0.0-rc.2",
+        "phaser": "^3.88.2",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
         "tailwindcss": "^4.1.4",

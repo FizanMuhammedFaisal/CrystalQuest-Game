@@ -6,9 +6,9 @@ import { globalTime } from "../TimeManager";
 import { KeyboardComponent } from "../components/input/keyboardComponent";
 import { EnimieSlime } from "../entities/enimies/enimieSlime";
 import { CharactrerGameObject } from "../components/gameobject/common/characterGameObject";
-import { DIRECTION } from "../../common/common";
+import { DIALOG, DIRECTION } from "../../common/common";
 import { DEBUG_COLLISION_ALPHA, PLAYER_START_MAX_HEALTH } from "../../config";
-import { Direction, LevelData } from "../types/types";
+import { Direction, GameObject, LevelData, LevelName } from "../types/types";
 import { TiledAreaObject } from "../tiled/types";
 import { TILED_LAYER_NAMES } from "../tiled/common";
 import {
@@ -19,7 +19,12 @@ import {
 } from "../tiled/tiled-utils";
 import { Passage } from "../components/gameobject/objects/passage";
 import { getDirectionOfObjectFromAnotherObject } from "../../common/utils";
-import { InventoryManager } from "../components/inventory/inventoryManager";
+
+import { WeaponComponent } from "../components/gameobject/weaponComponent";
+import { CUSTOM_EVENTS, EVENT_BUS } from "../../common/eventbus";
+import { DataManager } from "../../common/dataManager";
+// import { ShaderManager } from "../shaders/ShaderManager";
+import { EnimieTorch } from "../entities/enimies/enimieTorch";
 
 export class Game extends Scene {
     public tilemap: Phaser.Tilemaps.Tilemap;
@@ -28,6 +33,7 @@ export class Game extends Scene {
     private controls!: KeyboardComponent;
     public levelData: LevelData;
     private collitionLayer: Phaser.Tilemaps.TilemapLayer;
+    // private shaderManager: ShaderManager;
     public objectByAreaId: {
         [key: number]: {
             passageMap: { [key: number]: Passage };
@@ -44,7 +50,6 @@ export class Game extends Scene {
     public init(data: LevelData): void {
         this.levelData = data;
         this.currentAreaId = data.areaId;
-        console.log(InventoryManager.instance);
     }
 
     create() {
@@ -54,18 +59,17 @@ export class Game extends Scene {
         }
         this.controls = new KeyboardComponent(this.input.keyboard);
         this.layers = setupLayers(this);
-        this.setupPlayer();
-        this.player.setDepth(3);
+
         setupDepths(this.layers);
         this.createLevel();
-
+        this.setupPlayer();
+        this.player.setDepth(3);
         this.registerColliders();
         // 4. Setup camera bounds and follow
 
         // setupControls(this, this.gameCamera);
 
         const areaSize = this.objectByAreaId[this.levelData.areaId].area;
-        console.log(areaSize);
 
         this.cameras.main.setBounds(
             areaSize.x,
@@ -89,6 +93,40 @@ export class Game extends Scene {
         // );
 
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+        this.scene.launch("UIScene");
+        this.scene.launch("shaderScene");
+        this.registerCustomEvents();
+        // this.initializeShaders();
+        // this.debugWebGLSupport();
+    }
+    private debugWebGLSupport(): void {
+        // Check if WebGL is supported
+        const canvas = document.createElement("canvas");
+        const gl =
+            canvas.getContext("webgl") ||
+            canvas.getContext("experimental-webgl");
+
+        console.log("WebGL Context Available:", !!gl);
+        console.log("Phaser Renderer Type:", this.game.renderer.type);
+        console.log("Is WebGL:", this.game.renderer.type === Phaser.WEBGL);
+
+        // Check ShaderScene is available
+        const shaderSceneExists = !!this.game.scene.getScene("shaderScene");
+        console.log("ShaderScene exists:", shaderSceneExists);
+    }
+    private initializeShaders(): void {
+        // Create the shader manager (will also set up the shader scene)
+        this.shaderManager = new ShaderManager(this);
+
+        // Wait a frame before applying the shader to ensure everything is ready
+
+        this.time.delayedCall(100, () => {
+            if (this.shaderManager) {
+                const initialShaderType = this.shaderManager.getShaderType(2);
+
+                this.shaderManager.applyShader(initialShaderType, 100);
+            }
+        });
     }
 
     private createLevel() {
@@ -147,13 +185,38 @@ export class Game extends Scene {
         });
     }
     private setupPlayer() {
+        const startingDoor =
+            this.objectByAreaId[this.levelData.areaId].passageMap[
+                this.levelData.passageId
+            ];
+
+        const playerStartPosition = {
+            x: startingDoor.x + startingDoor.passageTransitionZone.width / 2,
+            y: startingDoor.y - startingDoor.passageTransitionZone.height / 2,
+        };
+
+        switch (startingDoor.direction) {
+            case DIRECTION.UP:
+                playerStartPosition.y += 40;
+                break;
+            case DIRECTION.DOWN:
+                playerStartPosition.y -= 40;
+                break;
+            case DIRECTION.LEFT:
+                playerStartPosition.x += 40;
+                break;
+            case DIRECTION.RIGHT:
+                playerStartPosition.x -= 40;
+                break;
+        }
+
         this.player = new Player({
             scene: this,
-            positions: { x: 400, y: 200 },
+            positions: { x: playerStartPosition.x, y: playerStartPosition.y },
             controls: this.controls,
             maxLife: PLAYER_START_MAX_HEALTH,
             currentLife: PLAYER_START_MAX_HEALTH,
-        });
+        }).setScale(1.2);
     }
     private registerColliders(): void {
         this.collitionLayer.setCollision(
@@ -186,19 +249,77 @@ export class Game extends Scene {
                 this.physics.add.overlap(
                     this.player,
                     this.objectByAreaId[areaId].enemyGroup,
-                    (player, enemy) => {
+                    () => {
+                        EVENT_BUS.emit(
+                            CUSTOM_EVENTS.SHOW_DIALOG,
+                            DIALOG.TESTING
+                        );
                         this.player.hit(DIRECTION.DOWN, 1);
-                        const enemyGameObject = enemy as CharactrerGameObject;
-                        enemyGameObject.hit(this.player.direction, 1);
                     }
                 );
+                this.physics.add.overlap(
+                    this.objectByAreaId[areaId].enemyGroup,
+                    this.player.weaponCompoent.body,
+                    (enemy) => {
+                        (enemy as CharactrerGameObject).hit(
+                            this.player.direction,
+                            this.player.weaponCompoent.weaponDamage
+                        );
+                    }
+                );
+
+                this.physics.add.collider(
+                    this.objectByAreaId[areaId].enemyGroup,
+                    this.collitionLayer
+                );
+                this.physics.add.collider(
+                    this.player,
+                    this.objectByAreaId[areaId].enemyGroup
+                );
+                const enemyWeapons = this.objectByAreaId[areaId].enemyGroup
+                    .getChildren()
+                    .flatMap((enemy) => {
+                        const weaponComponent =
+                            WeaponComponent.getComponent<WeaponComponent>(
+                                enemy as GameObject
+                            );
+                        if (weaponComponent !== undefined) {
+                            return [weaponComponent.body];
+                        }
+                        return [];
+                    });
+                if (enemyWeapons.length > 0) {
+                    this.physics.add.overlap(
+                        enemyWeapons,
+                        this.player,
+                        (enemyWeaponBody) => {
+                            const weaponComponent =
+                                WeaponComponent.getComponent<WeaponComponent>(
+                                    enemyWeaponBody as GameObject
+                                );
+                            if (
+                                weaponComponent === undefined ||
+                                weaponComponent.weapon === undefined
+                            ) {
+                                return;
+                            }
+
+                            weaponComponent.weapon.onCollitionCallback();
+
+                            this.player.hit(
+                                DIRECTION.DOWN,
+                                weaponComponent.weaponDamage
+                            );
+                        }
+                    );
+                }
             }
         });
     }
 
     private createAreas(map: Phaser.Tilemaps.Tilemap, layerName: string): void {
         const validTiledObjects = getTiledAreaObjectsFromMap(map, layerName);
-        console.log(validTiledObjects);
+
         validTiledObjects.forEach((tiledObject) => {
             this.objectByAreaId[tiledObject.id] = {
                 passageMap: {},
@@ -217,13 +338,10 @@ export class Game extends Scene {
             map,
             layerName
         );
-        console.log("validTiledObjects");
-        console.log(validTiledObjects);
 
         validTiledObjects.forEach((tiledObject) => {
             const passage = new Passage(this, tiledObject, areaId);
-            console.log(areaId);
-            console.log(this.objectByAreaId);
+
             this.objectByAreaId[areaId].passage.push(passage);
             this.objectByAreaId[areaId].passageMap[tiledObject.id] = passage;
             this.passageTransitionGroup.add(passage.passageTransitionZone);
@@ -235,7 +353,7 @@ export class Game extends Scene {
         areaId: number
     ): void {
         const validTiledObjects = getTiledEnemyObjectsFromMap(map, layerName);
-        console.log(validTiledObjects);
+
         if (this.objectByAreaId[areaId].enemyGroup === undefined) {
             this.objectByAreaId[areaId].enemyGroup = this.add.group([], {
                 runChildUpdate: true,
@@ -258,17 +376,23 @@ export class Game extends Scene {
                 this.objectByAreaId[areaId].enemyGroup?.add(slimeEnimie);
                 continue;
             }
+            if (tiledObject.type === 2) {
+                const torchEnimie = new EnimieTorch({
+                    scene: this,
+                    positions: { x: tiledObject.x, y: tiledObject.y },
+                });
+                this.objectByAreaId[areaId].enemyGroup?.add(torchEnimie);
+                continue;
+            }
         }
     }
     private handlePassageTransition(
         passageTrigger: Phaser.Types.Physics.Arcade.GameObjectWithBody
     ): void {
-        console.log("asdfads");
-        console.log("asdfads");
         const passage = this.objectByAreaId[this.currentAreaId].passageMap[
             passageTrigger.name
         ] as Passage;
-        console.log(passage.targetareaId);
+
         const targetPassage = this.objectByAreaId[passage.targetareaId]
             .passageMap[passage.targetPassageId] as Passage;
         passage.disableObject();
@@ -277,9 +401,16 @@ export class Game extends Scene {
             passage,
             targetPassage
         );
-        console.log(targetDirection);
+
         this.input.enabled = false;
+
         this.startPassageTransition(passage, targetPassage, targetDirection);
+        DataManager.instance.updateAreaData(
+            passage.targetLevel as LevelName,
+            passage.targetareaId,
+            passage.targetPassageId
+        );
+        DataManager.instance.saveProgress();
     }
     private startPassageTransition(
         passage: Passage,
@@ -318,7 +449,7 @@ export class Game extends Scene {
             duration: 500,
             ease: "Cubic.easeInOut",
             onComplete: () => {
-                this.changeArea(passage, targetPassage, dir, transitionScreen);
+                this.changeArea(passage, targetPassage, transitionScreen);
             },
         });
     }
@@ -326,11 +457,12 @@ export class Game extends Scene {
     private changeArea(
         passage: Passage,
         targetPassage: Passage,
-        dir: Direction,
+
         transitionScreen: Phaser.GameObjects.Rectangle
     ) {
         this.currentAreaId = targetPassage.areaId;
-
+        // const shaderType = this.shaderManager.getShaderType(this.currentAreaId);
+        // this.shaderManager.applyShader(shaderType, 800);
         // player position
         const passageWidth = targetPassage.passageTransitionZone.width || 32;
         const passageHeight = targetPassage.passageTransitionZone.height || 32;
@@ -399,6 +531,67 @@ export class Game extends Scene {
                 },
             });
         });
+    }
+    private registerCustomEvents(): void {
+        EVENT_BUS.on(
+            CUSTOM_EVENTS.ENEMY_DEFEATED,
+            this.checkForAllEnemiesDefeated,
+            this
+        );
+        EVENT_BUS.on(
+            CUSTOM_EVENTS.PLAYER_DEFEATED,
+            this.handlePlayerDefeatedEvent,
+            this
+        );
+        EVENT_BUS.on(CUSTOM_EVENTS.HIDE_DIALOG, this.handleDialogClosed, this);
+
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            EVENT_BUS.off(
+                CUSTOM_EVENTS.PLAYER_DEFEATED,
+                this.handlePlayerDefeatedEvent,
+                this
+            );
+            EVENT_BUS.off(
+                CUSTOM_EVENTS.ENEMY_DEFEATED,
+                this.checkForAllEnemiesDefeated,
+                this
+            );
+            EVENT_BUS.off(
+                CUSTOM_EVENTS.HIDE_DIALOG,
+                this.handleDialogClosed,
+                this
+            );
+        });
+    }
+    private handlePlayerDefeatedEvent(): void {
+        this.cameras.main.once(
+            Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
+            () => this.scene.start("GameOver")
+        );
+        this.cameras.main.fadeOut(1000, 0, 0, 0);
+    }
+    private checkForAllEnemiesDefeated(): void {
+        const enemyGroup = this.objectByAreaId[this.currentAreaId].enemyGroup;
+        if (enemyGroup === undefined) {
+            return;
+        }
+        const allRequiredEnemiesAreDefeated = enemyGroup
+            .getChildren()
+            .every((child) => {
+                if (!child.active) {
+                    return true;
+                }
+                if (child instanceof EnimieSlime) {
+                    return true;
+                }
+                return false;
+            });
+        if (allRequiredEnemiesAreDefeated) {
+            //haldeall enimies defeted
+        }
+    }
+    private handleDialogClosed(): void {
+        this.scene.resume();
     }
 
     update(_time: number, delta: number) {

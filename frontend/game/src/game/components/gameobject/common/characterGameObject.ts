@@ -13,6 +13,7 @@ import { Direction } from "../../../types/types";
 import { InvulnarableComponent } from "../invulnarableComponent";
 import { CHARACTER_STATES } from "../../statemachine/states/character/characterStates";
 import { LifeComponent } from "../lifeComponent";
+import { DataManager } from "../../../../common/dataManager";
 type CharacterConfig = {
     scene: Phaser.Scene;
     positions: { x: number; y: number };
@@ -80,7 +81,7 @@ export abstract class CharactrerGameObject extends Phaser.Physics.Arcade
 
         //general Configuration
         this._isPlayer = isPlayer ?? false;
-        this._idDefeated = false;
+        this._isDefeated = false;
     }
     get isDefeated(): boolean {
         return this._isDefeated;
@@ -106,23 +107,42 @@ export abstract class CharactrerGameObject extends Phaser.Physics.Arcade
     get isEnemy(): boolean {
         return !this._isPlayer;
     }
-    public hit(direction: Direction, damage: number): void {
-        if (this._isDefeated) {
+    hit(direction: Direction, damage: number): void {
+        // If already defeated or currently invulnerable, do nothing
+        if (this._isDefeated || this._invulnarableComponent.invulnarable) {
             return;
         }
-        if (this._invulnarableComponent.invulnarable) {
-            return;
-        }
+
+        // Take damage
         this._lifeComponent.takeDamage(damage);
+
+        // Update UI if this is the player
+        if (this._isPlayer) {
+            DataManager.instance.updatePlayerCurrentHealth(
+                this._lifeComponent.life
+            );
+        }
+
+        // Check if defeated
         if (this._lifeComponent.life === 0) {
-            this._idDefeated = true;
+            this._isDefeated = true;
             this._stateMachine.setState(
                 CHARACTER_STATES.DEATH_STATE,
                 direction
             );
             return;
         }
+
+        // Set hurt state
         this._stateMachine.setState(CHARACTER_STATES.HURT_STATE, direction);
+
+        // Make player invulnerable for a few seconds
+        this._invulnarableComponent.invulnarable = true;
+
+        // Set a timer to remove invulnerability after X seconds
+        this.scene.time.delayedCall(2000, () => {
+            this._invulnarableComponent.invulnarable = false;
+        });
     }
     get invalueableComponent(): InvulnarableComponent {
         return this._invulnarableComponent;

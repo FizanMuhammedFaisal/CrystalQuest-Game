@@ -15,7 +15,7 @@ export default defineConfig({
             exposes: {
                 "./Game": "./src/App.tsx",
                 "./assets": "./src/assets/index.ts",
-                "./GameUI.tsx": "./src/components/GameUI.tsx",
+                "./GameUI.tsx": "./src/reactComponents/GameUI.tsx",
             },
             shared: ["react", "react-dom"],
         }),

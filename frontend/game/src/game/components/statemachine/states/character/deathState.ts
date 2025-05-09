@@ -1,4 +1,5 @@
 import { CHARACTER_ANIMATIONS } from "../../../../../common/assets";
+import { CUSTOM_EVENTS, EVENT_BUS } from "../../../../../common/eventbus";
 import { CharactrerGameObject } from "../../../gameobject/common/characterGameObject";
 import { BaseCharacterState } from "./baseChacacterState";
 import { CHARACTER_STATES } from "./characterStates";
@@ -26,7 +27,13 @@ export class DeathState extends BaseCharacterState {
         );
     }
     private triggerDefeatedEvent() {
-        this._gameObject.disableBody();
+        this._gameObject.disableObject();
+        console.log(this._gameObject.isEnemy);
+        if (this._gameObject.isEnemy) {
+            EVENT_BUS.emit(CUSTOM_EVENTS.ENEMY_DEFEATED);
+        } else {
+            EVENT_BUS.emit(CUSTOM_EVENTS.PLAYER_DEFEATED);
+        }
         this.onDieCallback();
     }
 }

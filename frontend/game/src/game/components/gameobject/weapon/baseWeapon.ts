@@ -70,6 +70,9 @@ export abstract class BaseWeapon implements Weapon {
     }
     protected attackAnimationCompleteHanlder(): void {
         this._attacking = false;
+        console.log("asdf");
+
         this._weaponComponent.body.enable = false;
+        console.log(this._weaponComponent.body.enable);
     }
 }

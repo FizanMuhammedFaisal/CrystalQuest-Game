@@ -54,7 +54,10 @@ export class HurtState extends BaseCharacterState {
                 body.velocity.y = 0;
             }
         );
-        this._gameObject.invalueableComponent.invulnarable = true;
+
+        // Invulnerability is already set in the hit method
+        // this._gameObject.invalueableComponent.invulnarable = true;
+
         this.onHurtCallback();
 
         this._gameObject.animationComponent.playAnimation(

@@ -64,7 +64,7 @@ export class StateMachine {
         }
         this.isChangingState = false;
     }
-    private isCurrentState(name: string): boolean {
+    public isCurrentState(name: string): boolean {
         if (!this.currentState) {
             return false;
         }

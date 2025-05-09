@@ -21,7 +21,7 @@ export class GameControls {
     }
 }
 
-export function setupControls(scene: Game, camera: GameCamera): void {
+export function setupControls(scene: Game): void {
     const areaSize = scene.objectByAreaId[scene.levelData.areaId].area;
     scene.cameras.main.setBounds(
         areaSize.x,

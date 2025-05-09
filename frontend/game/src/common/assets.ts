@@ -4,7 +4,14 @@ export const ASSET_PACK_KEYS = {
 export const ASSET_KEYS = {
     PLAYER: "PLAYER",
     ENIMIE_SLIME: "ENIMIE_SLIME",
+
     COLLISION: "CollisionTiles",
+    HUD_NUMBERS: "HUD_NUMBERS",
+    FONT_PRESS_START_2P: "FONT_PRESS_START_2P",
+    UI_DIALOG: "UI_DIALOG",
+    UI_ICONS: "UI_ICONS",
+    UI_CURSOR: "UI_CURSOR",
+    TORCH_ENIMIE: "TORCH_ENIMIE",
 } as const;
 export const PLAYER_ANIMATION_KEYS = {
     WALK_DOWN: "player_walk_down",
@@ -42,10 +49,28 @@ export const ENIMIE_SLIME_ANIMATION_KEYS = {
     HURT_LEFT: "enimie_slime_jump_right",
     HURT_DOWN: "enimie_slime_jump_right",
     HURT_UP: "enimie_slime_jump_right",
-    DIE_DOWN: "enimie_slime_jump_right",
-    DIE_UP: "enimie_slime_jump_right",
-    DIE_LEFT: "enimie_slime_jump_right",
-    DIE_RIGHT: "enimie_slime_jump_right",
+    DIE_DOWN: "enimie_slime_death",
+    DIE_UP: "enimie_slime_death",
+    DIE_LEFT: "enimie_slime_death",
+    DIE_RIGHT: "enimie_slime_death",
+} as const;
+export const ENIMIE_TORCH_ANIMATION_KEYS = {
+    WALK_RIGHT: "Run",
+    WALK_LEFT: "Run",
+    IDLE_RIGHT: "Idle",
+    IDLE_LEFT: "Idle",
+    HURT_RIGHT: "Idle",
+    HURT_LEFT: "Idle",
+    HURT_DOWN: "Idle",
+    HURT_UP: "Idle",
+    DIE_DOWN: "Death",
+    DIE_UP: "Death",
+    DIE_LEFT: "Death",
+    DIE_RIGHT: "Death",
+    ATTACK_RIGHT: "Attack_Right",
+    ATTACK_LEFT: "Attack_Right",
+    ATTACK_UP: "Attack_Up",
+    ATTACK_DOWN: "Attack_Down",
 } as const;
 export const CHARACTER_ANIMATIONS = {
     IDLE_DOWN: "IDLE_DOWN",
@@ -77,3 +102,15 @@ export const CHARACTER_ANIMATIONS = {
     DIE_LEFT: "DIE_LEFT",
     DIE_RIGHT: "DIE_RIGHT",
 } as const;
+
+export const HEART_TEXTURE_FRAME = {
+    NONE: "15",
+    FULL: "10",
+    EMPTY: "14",
+    HALF: "12",
+} as const;
+
+export const HEART_ANIMATIONS = {
+    LOSE_LAST_HALF: "heart_lose_last_half",
+    LOSE_FIRST_HALF: "heart_lost_first_half",
+};

@@ -19,13 +19,10 @@ const config: Phaser.Types.Core.GameConfig = {
     physics: {
         default: "arcade",
         arcade: {
-            debug: false,
+            debug: true,
         },
     },
-    plugins: {},
-    // pipeline: {
-    //     DayNight: DayNightPipeline,
-    // },
+
     render: {
         pixelArt: true,
         antialias: false,

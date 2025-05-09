@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { GameScene } from "../../types/scenes";
+
 import { InputComponent } from "../../components/input/inputComponent";
 import { CharactrerGameObject } from "../../components/gameobject/common/characterGameObject";
 import { AnimationConfig } from "../../components/gameobject/animationComponent";
@@ -20,7 +20,7 @@ import { State } from "../../components/statemachine/statemachine";
 import { DeathState } from "../../components/statemachine/states/character/deathState";
 
 type TEnimie = {
-    scene: GameScene;
+    scene: Phaser.Scene;
     positions: { x: number; y: number };
 };
 
@@ -29,7 +29,7 @@ export class EnimieSlime extends CharactrerGameObject {
     private followingPlayer: boolean = false;
     private player: Phaser.GameObjects.Sprite | null = null;
     private initialPosition: { x: number; y: number };
-    private _scene: GameScene;
+    private _scene: Phaser.Scene;
     constructor(config: TEnimie) {
         const { scene } = config;
 
@@ -83,17 +83,17 @@ export class EnimieSlime extends CharactrerGameObject {
             HURT_UP: {
                 key: ENIMIE_SLIME_ANIMATION_KEYS.HURT_UP,
                 repeat: 0,
-                ignoreIfPlaying: true,
+                ignoreIfPlaying: false,
             },
             HURT_LEFT: {
                 key: ENIMIE_SLIME_ANIMATION_KEYS.HURT_LEFT,
                 repeat: 0,
-                ignoreIfPlaying: true,
+                ignoreIfPlaying: false,
             },
             HURT_RIGHT: {
                 key: ENIMIE_SLIME_ANIMATION_KEYS.HURT_RIGHT,
                 repeat: 0,
-                ignoreIfPlaying: true,
+                ignoreIfPlaying: false,
             },
             DIE_DOWN: {
                 key: ENIMIE_SLIME_ANIMATION_KEYS.DIE_DOWN,
@@ -132,16 +132,34 @@ export class EnimieSlime extends CharactrerGameObject {
         this._scene = scene;
         // Save initial position for returning when player is out of range
         this.initialPosition = { x: config.positions.x, y: config.positions.y };
-        console.log(this.initialPosition);
+
         // Find the player in the scene
         this.findPlayer();
-
+        this.setDepth(2);
         // Initialize state machine
         this._stateMachine.addState(new IdleState(this));
         this._stateMachine.addState(new MoveState(this));
         this._stateMachine.addState(
             new HurtState(this, ENIMIE_SLIME_HURT_PUSH_BACK_SPEED, () => {
                 console.log("enimie hurt");
+
+                const originalAlpha = this.alpha;
+
+                this.setTint(0xffffff);
+
+                this.setBlendMode(Phaser.BlendModes.ADD);
+
+                this.scene.tweens.add({
+                    targets: this,
+                    alpha: { from: 1.5, to: 0.8, yoyo: true },
+                    duration: 80,
+                    repeat: 2,
+                    onComplete: () => {
+                        this.clearTint();
+                        this.setBlendMode(Phaser.BlendModes.NORMAL);
+                        this.setAlpha(originalAlpha);
+                    },
+                });
             }) as State
         );
 
@@ -165,7 +183,6 @@ export class EnimieSlime extends CharactrerGameObject {
 
         //  as Phaser.GameObjects.Sprite;
     }
-
     private updateAI(): void {
         if (!this.player) {
             this.findPlayer();

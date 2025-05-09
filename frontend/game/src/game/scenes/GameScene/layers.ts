@@ -18,12 +18,16 @@ export function setupLayers(scene: Game): GameLayers {
         "WoodWalls",
         "WoodWalls"
     );
+    const BridgeTileset = scene.tilemap.addTilesetImage("bridge", "Bridge");
+    const Tiles2Tileset = scene.tilemap.addTilesetImage("grass2", "Tiles2");
 
     if (
         !TreesTileset ||
         !tilesTileset ||
         !WoodWallsTileset ||
-        !GroundSetTileset
+        !GroundSetTileset ||
+        !BridgeTileset ||
+        !Tiles2Tileset
     ) {
         throw new Error("Failed to load tilesets");
     }
@@ -32,12 +36,14 @@ export function setupLayers(scene: Game): GameLayers {
         ground: scene.tilemap.createLayer("GroundLayer", [
             tilesTileset,
             GroundSetTileset,
+            Tiles2Tileset,
         ])!,
         world: scene.tilemap.createLayer("WorldLayer", [
             tilesTileset,
             TreesTileset,
             WoodWallsTileset,
             GroundSetTileset,
+            Tiles2Tileset,
         ])!,
         overlay: scene.tilemap.createLayer("OverlayLayer", [
             TreesTileset,
