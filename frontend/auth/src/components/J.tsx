@@ -8,6 +8,7 @@ import {
 } from 'motion/react'
 
 import { useEffect, useRef, useState } from 'react'
+import LogoutButton from './LogoutButton'
 
 /**
  * For the overlay circles, this example uses elements with
@@ -67,6 +68,7 @@ export default function WarpOverlay({
           <div className='iphone-status-bar'>
             <div className='status-time'>9:41</div>
           </div>
+          <LogoutButton />
 
           <div className='app-content' ref={ref}>
             <motion.div

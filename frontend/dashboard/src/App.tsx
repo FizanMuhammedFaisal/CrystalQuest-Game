@@ -1,4 +1,4 @@
-import AdminDashboard from './DashboardLayout'
+import AdminDashboard from './components/DashboardLayout'
 
 function App() {
   return (

@@ -1,10 +1,10 @@
 import type React from 'react'
-
 import { useState } from 'react'
-
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { PixelButton } from 'game/GameUI.tsx'
 import { Diamond, Clock, Users, Sparkles, ChevronRight } from 'lucide-react'
+import { isAuthenticated } from './store/store'
+
 interface GameLaunchProps {
   onNavigate: (path: string) => void
 }
@@ -19,7 +19,6 @@ const containerVariants: Variants = {
     }
   }
 }
-//
 
 const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
@@ -70,7 +69,6 @@ const letterVariants: Variants = {
 // Crystal decoration component
 const CrystalDecoration = ({ className = '' }: { className?: string }) => {
   const crystals = Array.from({ length: 9 }, (_, i) => i)
-
   return (
     <div className={`grid grid-cols-3 gap-1 ${className}`}>
       {crystals.map(i => (
@@ -98,11 +96,17 @@ const CrystalDecoration = ({ className = '' }: { className?: string }) => {
 
 export default function GameLaunchScreen({ onNavigate }: GameLaunchProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const [showStats, setShowStats] = useState(true)
+  const authenticated = isAuthenticated()
+  console.log(authenticated, 'authenticated')
+  const [showStats, setShowStats] = useState(authenticated)
   const gameTitle = 'CRYSTAL QUEST'
+
   const toggleStats = () => {
-    setShowStats(!showStats)
+    if (authenticated) {
+      setShowStats(!showStats)
+    }
   }
+
   const handleLaunch = () => {
     setIsLoading(true)
     // Simulate loading before navigation
@@ -162,62 +166,64 @@ export default function GameLaunchScreen({ onNavigate }: GameLaunchProps) {
 
       {/* Main content */}
       <div className='flex flex-col md:flex-row flex-1 p-6 gap-8'>
-        {/* Game Stats Panel */}
-        <AnimatePresence>
-          {showStats && (
-            <motion.div
-              className='w-full md:w-1/3 p-6 border-2 border-pink-900/50 rounded-lg bg-gray-900/50 backdrop-blur-sm'
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 100, damping: 15 }}
-            >
-              <motion.h2
-                className='text-2xl mb-6 flex items-center gap-2 text-pink-400 border-b-2 border-pink-900/30 pb-2'
-                variants={itemVariants}
-              >
-                <Diamond className='h-5 w-5' />
-                Crystal Stats
-              </motion.h2>
-
-              <div className='space-y-4'>
-                <StatItem
-                  icon={<Diamond className='h-4 w-4 text-pink-400' />}
-                  label='Collected Crystals'
-                  value='1,248'
-                  delay={0.1}
-                />
-                <StatItem
-                  icon={<Users className='h-4 w-4 text-purple-400' />}
-                  label='Total Served'
-                  value='342'
-                  delay={0.2}
-                />
-                <StatItem
-                  icon={<Clock className='h-4 w-4 text-blue-400' />}
-                  label='Play Time'
-                  value='24h 18m'
-                  delay={0.3}
-                />
-              </div>
-
+        {/* Game Stats Panel - Only show if authenticated */}
+        {authenticated && (
+          <AnimatePresence>
+            {showStats && (
               <motion.div
-                className='mt-8 p-4 bg-gray-800/80 rounded-md border-2 border-pink-900/30'
-                variants={itemVariants}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+                className='w-full md:w-1/3 p-6 border-2 border-pink-900/50 rounded-lg bg-gray-900/50 backdrop-blur-sm'
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 100, damping: 15 }}
               >
-                <h3 className='text-lg mb-2 text-pink-400 flex items-center gap-2'>
-                  <Sparkles className='h-4 w-4' />
-                  Last Session
-                </h3>
-                <p className='text-sm text-gray-300'>Crystals: 86</p>
-                <p className='text-sm text-gray-300'>Served: 24</p>
-                <p className='text-sm text-gray-300'>Time: 1h 45m</p>
+                <motion.h2
+                  className='text-2xl mb-6 flex items-center gap-2 text-pink-400 border-b-2 border-pink-900/30 pb-2'
+                  variants={itemVariants}
+                >
+                  <Diamond className='h-5 w-5' />
+                  Crystal Stats
+                </motion.h2>
+
+                <div className='space-y-4'>
+                  <StatItem
+                    icon={<Diamond className='h-4 w-4 text-pink-400' />}
+                    label='Collected Crystals'
+                    value='1,248'
+                    delay={0.1}
+                  />
+                  <StatItem
+                    icon={<Users className='h-4 w-4 text-purple-400' />}
+                    label='Total Served'
+                    value='342'
+                    delay={0.2}
+                  />
+                  <StatItem
+                    icon={<Clock className='h-4 w-4 text-blue-400' />}
+                    label='Play Time'
+                    value='24h 18m'
+                    delay={0.3}
+                  />
+                </div>
+
+                <motion.div
+                  className='mt-8 p-4 bg-gray-800/80 rounded-md border-2 border-pink-900/30'
+                  variants={itemVariants}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <h3 className='text-lg mb-2 text-pink-400 flex items-center gap-2'>
+                    <Sparkles className='h-4 w-4' />
+                    Last Session
+                  </h3>
+                  <p className='text-sm text-gray-300'>Crystals: 86</p>
+                  <p className='text-sm text-gray-300'>Served: 24</p>
+                  <p className='text-sm text-gray-300'>Time: 1h 45m</p>
+                </motion.div>
               </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            )}
+          </AnimatePresence>
+        )}
 
         {/* Launch Button Area */}
         <motion.div
@@ -267,25 +273,29 @@ export default function GameLaunchScreen({ onNavigate }: GameLaunchProps) {
           >
             Press to begin your journey <ChevronRight className='h-4 w-4' />
           </motion.div>
-          <motion.div
-            animate={{
-              scale: [1, 1.05, 1]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Number.POSITIVE_INFINITY,
-              repeatType: 'reverse'
-            }}
-            whileHover={{ scale: 1.05 }}
-          >
-            <PixelButton
-              variant='warning'
-              className={`${isLoading ? 'hidden' : ''} mt-10`}
-              onClick={toggleStats}
+
+          {/* Only show stats toggle button if authenticated */}
+          {authenticated && (
+            <motion.div
+              animate={{
+                scale: [1, 1.05, 1]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Number.POSITIVE_INFINITY,
+                repeatType: 'reverse'
+              }}
+              whileHover={{ scale: 1.05 }}
             >
-              Show Stats
-            </PixelButton>
-          </motion.div>
+              <PixelButton
+                variant='warning'
+                className={`${isLoading ? 'hidden' : ''} mt-10`}
+                onClick={toggleStats}
+              >
+                {showStats ? 'Hide Stats' : 'Show Stats'}
+              </PixelButton>
+            </motion.div>
+          )}
 
           {/* Crystal counter animation */}
           <motion.div

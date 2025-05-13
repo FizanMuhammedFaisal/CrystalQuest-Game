@@ -12,12 +12,13 @@ export default defineConfig({
       name: 'portal',
       filename: 'remoteEntry.js',
       remotes: {
-        game: 'http://localhost:8080/assets/remoteEntry.js'
+        game: 'http://localhost:8080/assets/remoteEntry.js',
+        authStore: 'http://localhost:8088/assets/remoteEntry.js'
       },
       exposes: {
         './Portal': './src/App.tsx'
       },
-      shared: ['react', 'react-dom']
+      shared: ['react', 'react-dom', 'zustand']
     })
   ],
   build: {

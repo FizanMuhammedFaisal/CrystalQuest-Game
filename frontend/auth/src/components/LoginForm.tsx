@@ -3,14 +3,16 @@ import { useState } from 'react'
 import { motion } from 'motion/react'
 import { PixelButton } from 'game/GameUI.tsx'
 import { Eye, EyeOff, User, Lock } from 'lucide-react'
+// import { useMutation } from '@tanstack/react-query'
+import apiClient from '../api/apiClient'
+import { setAccessToken, setUser } from 'authStore/AuthStore'
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   })
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -18,8 +20,21 @@ export function LoginForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Login submitted:', formData)
-    // Add your login logic here
+
+    const login = async () => {
+      try {
+        const res = await apiClient.post('/auth/login', formData)
+        if (res.data.success) {
+          const { accessToken } = res.data.data
+          setAccessToken(accessToken)
+          setUser(res.data.data.user)
+          // setAccessTokenLocal(res.data.data.accessToken)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    login()
   }
 
   return (
@@ -50,18 +65,18 @@ export function LoginForm() {
         >
           <form onSubmit={handleSubmit} className='space-y-6'>
             <div className='space-y-2'>
-              <label className='font-pixel text-sm text-white'>USERNAME</label>
+              <label className='font-pixel text-sm text-white'>EMAIL</label>
               <div className='relative'>
                 <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
                   <User className='h-5 w-5 text-[#4ADE80]' />
                 </div>
                 <input
                   type='text'
-                  name='username'
-                  value={formData.username}
+                  name='email'
+                  value={formData.email}
                   onChange={handleChange}
                   className='font-pixel w-full border-4 border-t-[#4B5563] border-l-[#4B5563] border-r-[#1F2937] border-b-[#1F2937] bg-[#1F2937] p-2 pl-10 text-white focus:outline-none'
-                  placeholder='ENTER USERNAME'
+                  placeholder='ENTER EMAIL'
                   required
                 />
               </div>

@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { PixelButton } from 'game/GameUI.tsx'
 import { Eye, EyeOff, User, Mail, Lock, Shield } from 'lucide-react'
+import apiClient from '../api/apiClient'
+import { setAccessToken, setUser } from '../store/store'
 
 export function SignupForm() {
   const [showPassword, setShowPassword] = useState(false)
@@ -15,17 +17,48 @@ export function SignupForm() {
     confirmPassword: ''
   })
 
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+    setError(null) // Clear error when user types
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Signup submitted:', formData)
-    // Add your signup logic here
-  }
+    const { username, email, password, confirmPassword } = formData
 
+    // Validation
+    if (!username || !email || !password || !confirmPassword) {
+      return setError('All fields are required.')
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return setError('Please enter a valid email address.')
+    }
+
+    if (password.length < 6) {
+      return setError('Password must be at least 6 characters.')
+    }
+
+    if (password !== confirmPassword) {
+      return setError('Passwords do not match.')
+    }
+
+    // Submit to backend
+    try {
+      const res = await apiClient.post('/auth/register', { ...formData })
+      setAccessToken(res.data.data.accessToken)
+      setUser(res.data.data.user)
+      setSuccess(true)
+      setError(null)
+    } catch (err) {
+      setError('Failed to register. Please try again.')
+      console.error(err)
+    }
+  }
   return (
     <motion.div
       initial={{ y: 20 }}
@@ -45,6 +78,10 @@ export function SignupForm() {
             CREATE YOUR ACCOUNT TO JOIN THE ADVENTURE
           </p>
         </motion.div>
+        {error && <p className='text-red-500 text-sm'>{error}</p>}
+        {success && (
+          <p className='text-green-600 text-sm'>Registration successful!</p>
+        )}
 
         <motion.div
           className='border-4 border-t-[#93C5FD] border-l-[#93C5FD] border-r-[#1D4ED8] border-b-[#1D4ED8] bg-[#0F172A] p-6'
@@ -66,7 +103,6 @@ export function SignupForm() {
                   onChange={handleChange}
                   className='font-pixel w-full border-4 border-t-[#4B5563] border-l-[#4B5563] border-r-[#1F2937] border-b-[#1F2937] bg-[#1F2937] p-2 pl-10 text-white focus:outline-none'
                   placeholder='CHOOSE USERNAME'
-                  required
                 />
               </div>
             </div>
@@ -84,7 +120,6 @@ export function SignupForm() {
                   onChange={handleChange}
                   className='font-pixel w-full border-4 border-t-[#4B5563] border-l-[#4B5563] border-r-[#1F2937] border-b-[#1F2937] bg-[#1F2937] p-2 pl-10 text-white focus:outline-none'
                   placeholder='ENTER EMAIL'
-                  required
                 />
               </div>
             </div>
@@ -102,7 +137,6 @@ export function SignupForm() {
                   onChange={handleChange}
                   className='font-pixel w-full border-4 border-t-[#4B5563] border-l-[#4B5563] border-r-[#1F2937] border-b-[#1F2937] bg-[#1F2937] p-2 pl-10 text-white focus:outline-none'
                   placeholder='CREATE PASSWORD'
-                  required
                 />
                 <button
                   type='button'
@@ -133,7 +167,6 @@ export function SignupForm() {
                   onChange={handleChange}
                   className='font-pixel w-full border-4 border-t-[#4B5563] border-l-[#4B5563] border-r-[#1F2937] border-b-[#1F2937] bg-[#1F2937] p-2 pl-10 text-white focus:outline-none'
                   placeholder='CONFIRM PASSWORD'
-                  required
                 />
                 <button
                   type='button'
@@ -147,29 +180,6 @@ export function SignupForm() {
                   )}
                 </button>
               </div>
-            </div>
-
-            <div className='flex items-center'>
-              <input
-                id='terms'
-                name='terms'
-                type='checkbox'
-                className='h-4 w-4 border-[#93C5FD] bg-[#1F2937] text-[#93C5FD] focus:ring-[#93C5FD]'
-                required
-              />
-              <label
-                htmlFor='terms'
-                className='ml-2 block font-pixel text-xs text-[#9CA3AF]'
-              >
-                I AGREE TO THE{' '}
-                <a href='#' className='text-[#93C5FD] hover:text-[#60A5FA]'>
-                  TERMS
-                </a>{' '}
-                AND{' '}
-                <a href='#' className='text-[#93C5FD] hover:text-[#60A5FA]'>
-                  PRIVACY POLICY
-                </a>
-              </label>
             </div>
 
             <div className='pt-4'>

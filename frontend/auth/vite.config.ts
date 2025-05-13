@@ -11,13 +11,18 @@ export default defineConfig({
       name: 'auth',
       filename: 'remoteEntry.js',
       remotes: {
-        game: 'http://localhost:8080/assets/remoteEntry.js'
+        game: 'http://localhost:8080/assets/remoteEntry.js',
+        authStore: 'http://localhost:8088/assets/remoteEntry.js'
       },
       exposes: {
         './Auth': './src/App.tsx',
         './Navbar': './src/components/Navbar.tsx'
       },
-      shared: ['react', 'react-dom', 'react-router-dom']
+      shared: {
+        react: { singleton: true },
+        'react-dom': { singleton: true },
+        zustand: { singleton: true }
+      }
     })
   ],
   build: {

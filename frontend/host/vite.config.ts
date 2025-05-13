@@ -15,7 +15,16 @@ export default defineConfig({
         portal: 'http://localhost:8082/assets/remoteEntry.js',
         dashboard: 'http://localhost:8083/assets/remoteEntry.js'
       },
-      shared: ['react', 'react-dom']
+      exposes: {
+        './AuthStore': './src/store/authStore.ts'
+      },
+
+      shared: {
+        react: { singleton: true },
+        'react-dom': { singleton: true },
+        zustand: { singleton: true },
+        '@tanstack/react-query': { singleton: true }
+      }
     })
   ],
   build: {

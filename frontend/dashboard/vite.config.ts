@@ -15,7 +15,15 @@ export default defineConfig({
       exposes: {
         './Dashboard': './src/App.tsx'
       },
-      shared: ['react', 'react-dom']
+      remotes: {
+        authStore: 'http://localhost:8088/assets/remoteEntry.js'
+      },
+      shared: {
+        react: { singleton: true },
+        'react-dom': { singleton: true },
+        zustand: { singleton: true },
+        '@tanstack/react-query': { singleton: true }
+      }
     })
   ],
   build: {

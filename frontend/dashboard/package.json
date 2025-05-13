@@ -5,18 +5,22 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": " vite build",
     "lint": "eslint .",
     "preview": "vite preview --port 8083"
   },
   "dependencies": {
     "@originjs/vite-plugin-federation": "^1.4.1",
     "@tailwindcss/vite": "^4.1.4",
+    "@tanstack/react-query": "^5.76.0",
+    "axios": "^1.9.0",
     "lucide-react": "^0.501.0",
     "motion": "^12.7.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwindcss": "^4.1.4"
+    "react-router-dom": "^7.6.0",
+    "tailwindcss": "^4.1.4",
+    "zustand": "^5.0.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

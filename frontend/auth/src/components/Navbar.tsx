@@ -1,15 +1,26 @@
 import { useState } from 'react'
 import { PixelButton } from 'game/GameUI.tsx'
+import { clearAuth } from '../store/store'
+import apiClient from '../api/apiClient'
+import { isAuthenticated } from 'authStore/AuthStore'
+
 interface NavbarProps {
   navigate: (path: string) => void
 }
 
 const Navbar = ({ navigate }: NavbarProps) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
+  const authstatus = isAuthenticated()
+  const [isLoggedIn, setIsLoggedIn] = useState(authstatus)
+  console.log(isLoggedIn, 'isLoggedIn')
   const handleLogin = () => {
     if (isLoggedIn) {
-      setIsLoggedIn(false)
+      try {
+        apiClient.get('/auth/logout')
+        clearAuth()
+        setIsLoggedIn(false)
+      } catch (error) {
+        console.error('Error during logout:', error)
+      }
     } else {
       navigate('/auth/login')
     }

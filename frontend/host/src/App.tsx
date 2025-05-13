@@ -5,6 +5,8 @@ import {
   useNavigate
 } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
+import ProtectedWrapper from './wrapper/ProtectedWrapper'
+import { useAuthInitialization } from './hooks/useAuthInitialization'
 
 const Game = lazy(() =>
   import('game/Game').catch(() => ({
@@ -81,7 +83,11 @@ const router = createBrowserRouter([
   },
   {
     path: 'dashboard',
-    element: <LazyComponent Component={DashBoard} />
+    element: (
+      <ProtectedWrapper>
+        <LazyComponent Component={DashBoard} />
+      </ProtectedWrapper>
+    )
   },
   {
     path: '/game',
@@ -90,6 +96,11 @@ const router = createBrowserRouter([
 ])
 
 function App() {
+  const isAuthInitialized = useAuthInitialization()
+
+  if (!isAuthInitialized) {
+    return <div>Loading application...</div>
+  }
   return <RouterProvider router={router} />
 }
 
